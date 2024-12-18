@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         网站弹窗广告拦截器
+// @name         网站弹窗广告拦截
 // @namespace    http://tampermonkey.net/
-// @version      1.1
-// @description  拦截花瓣、站酷、千图网、享设计、堆友、稿定设计、3D溜溜等网站的弹窗广告
+// @version      1.2
+// @description  智能拦截弹窗广告，保持网页功能正常
 // @match        *://huaban.com/*
 // @match        *://zcool.com.cn/*
 // @match        *://qiantu.com/*
@@ -16,9 +16,9 @@
 (function() {
     'use strict';
 
-    // 通用的弹窗拦截函数
-    function blockPopups() {
-        // 扩展的弹窗选择器
+    // 智能拦截函数
+    function smartBlockPopups() {
+        // 复杂的选择器，增加了更多判断
         const popupSelectors = [
             '.modal', '.popup', '.dialog', '.ad-popup',
             '#ad-modal', '[id*="popup"]', '[class*="modal"]',
@@ -32,121 +32,119 @@
         popupSelectors.forEach(selector => {
             const elements = document.querySelectorAll(selector);
             elements.forEach(el => {
-                // 完全移除弹窗
-                el.remove();
+                // 更智能的移除判断
+                if (isReallySafeToRemove(el)) {
+                    // 先隐藏，而不是直接移除
+                    el.style.display = 'none';
+                    el.style.visibility = 'hidden';
+                    el.style.opacity = '0';
 
-                // 移除可能阻挡页面的遮罩层
-                const overlays = document.querySelectorAll('.overlay, .mask, [class*="mask"]');
-                overlays.forEach(overlay => overlay.remove());
+                    // 尝试移除遮罩效果
+                    el.style.pointerEvents = 'none';
+                }
             });
         });
-
-        // 禁用特定事件
-        document.addEventListener('contextmenu', function(e) {
-            // 阻止右键菜单弹窗
-            e.preventDefault();
-        }, true);
     }
 
-    // 初始页面加载时执行
-    blockPopups();
+    // 安全移除判断函数
+    function isReallySafeToRemove(element) {
+        // 检查元素是否是真正的广告弹窗
+        if (!element) return false;
 
-    // 持续监控页面变化
-    const observer = new MutationObserver(blockPopups);
+        // 排除可能影响网页功能的关键元素
+        const criticalClasses = [
+            'login-modal',
+            'user-agreement',
+            'essential-popup',
+            'system-notice'
+        ];
+
+        const criticalIds = [
+            'login-modal',
+            'user-agreement',
+            'essential-popup',
+            'system-notice'
+        ];
+
+        // 检查类名和ID
+        const elementClass = element.className || '';
+        const elementId = element.id || '';
+
+        const isCritical = criticalClasses.some(cls => elementClass.includes(cls)) ||
+                           criticalIds.some(id => elementId.includes(id));
+
+        if (isCritical) return false;
+
+        // 检查弹窗是否包含重要内容
+        const importantTextKeywords = [
+            '协议', '隐私', '用户', '系统',
+            'agreement', 'privacy', 'notice',
+            'system', 'warning'
+        ];
+
+        const text = element.innerText || '';
+        const hasImportantText = importantTextKeywords.some(keyword =>
+            text.toLowerCase().includes(keyword)
+        );
+
+        if (hasImportantText) return false;
+
+        // 检查元素大小，过小的可能是广告
+        const rect = element.getBoundingClientRect();
+        if (rect.width < 50 || rect.height < 50) return true;
+
+        // 检查是否包含明显的广告特征
+        const adKeywords = [
+            'ad', 'advertisement', '广告',
+            'sponsor', '推广', 'banner'
+        ];
+
+        const isAdElement = adKeywords.some(keyword =>
+            (elementClass.toLowerCase().includes(keyword) ||
+             elementId.toLowerCase().includes(keyword))
+        );
+
+        return isAdElement;
+    }
+
+    // 恢复页面可交互性
+    function restorePageInteractivity() {
+        // 移除可能阻止页面交互的样式
+        document.body.style.overflow = '';
+        document.documentElement.style.overflow = '';
+
+        // 尝试移除所有遮罩层
+        const masks = document.querySelectorAll('.mask, .overlay, [class*="mask"]');
+        masks.forEach(mask => {
+            mask.style.display = 'none';
+            mask.style.visibility = 'hidden';
+        });
+    }
+
+    // 初始化拦截
+    function initialize() {
+        // 延迟执行，确保页面完全加载
+        setTimeout(() => {
+            smartBlockPopups();
+            restorePageInteractivity();
+        }, 1000);
+    }
+
+    // 监听页面变化
+    const observer = new MutationObserver(() => {
+        smartBlockPopups();
+        restorePageInteractivity();
+    });
+
     observer.observe(document.body, {
         childList: true,
         subtree: true
     });
 
-    // 额外的针对性拦截
-    function websiteSpecificBlock() {
-        // 各网站特定拦截规则
-        const siteSpecificSelectors = {
-            'huaban.com': [
-                '#huaban-modal',
-                '.huaban-popup',
-                '#user-guide-popup'
-            ],
-            'zcool.com.cn': [
-                '.zcool-ad-popup',
-                '#zcool-guide-modal',
-                '.zcool-vip-popup'
-            ],
-            'qiantu.com': [
-                '#qiantu-popup',
-                '.qiantu-ad-modal',
-                '#download-guide'
-            ],
-            'xiangshejia.com': [
-                '.xsj-popup',
-                '#xsj-ad-modal',
-                '.xsj-guide-layer'
-            ],
-            'duiyou.cn': [
-                '.duiyou-popup',
-                '#duiyou-ad-modal',
-                '.duiyou-guide'
-            ],
-            'gaoding.com': [
-                '.gaoding-popup',
-                '#gaoding-ad-modal',
-                '.gaoding-guide-layer'
-            ],
-            '3dliu.com': [
-                '.3dliu-popup',
-                '#3dliu-ad-modal',
-                '.3dliu-guide-layer'
-            ]
-        };
-
-        // 获取当前域名
-        const hostname = window.location.hostname;
-
-        // 遍历并移除匹配的选择器
-        Object.keys(siteSpecificSelectors).forEach(domain => {
-            if (hostname.includes(domain)) {
-                siteSpecificSelectors[domain].forEach(selector => {
-                    const elements = document.querySelectorAll(selector);
-                    elements.forEach(el => el.remove());
-                });
-            }
-        });
-
-        // 通用广告和引导层拦截
-        const generalAdSelectors = [
-            '[class*="guide-layer"]',
-            '[id*="guide-modal"]',
-            '.vip-popup',
-            '.download-guide',
-            '[class*="advertising"]'
-        ];
-
-        generalAdSelectors.forEach(selector => {
-            const elements = document.querySelectorAll(selector);
-            elements.forEach(el => el.remove());
-        });
+    // 页面加载时初始化
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initialize);
+    } else {
+        initialize();
     }
-
-    // 执行网站特定拦截
-    websiteSpecificBlock();
-
-    // 禁用一些常见的广告加载脚本
-    function disableAdScripts() {
-        const scriptsToBlock = [
-            'ad.js',
-            'advertisement.js',
-            'popunder.js',
-            'tracker.js'
-        ];
-
-        const scripts = document.getElementsByTagName('script');
-        for (let script of scripts) {
-            if (script.src && scriptsToBlock.some(badScript => script.src.includes(badScript))) {
-                script.remove();
-            }
-        }
-    }
-
-    // 执行广告脚本禁用
-    disableAdScripts();
 })();
