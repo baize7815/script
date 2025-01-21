@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         ChatAI重置
+// @name         Chat指纹重置
 // @namespace    http://tampermonkey.net/
 // @version      1.0
 // @description  全维度环境隔离+指纹伪装，支持多域名
