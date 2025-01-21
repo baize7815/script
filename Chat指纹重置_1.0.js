@@ -1,10 +1,11 @@
 // ==UserScript==
-// @name         Chat100.ai 极限突破
+// @name         ChatAI重置
 // @namespace    http://tampermonkey.net/
 // @version      1.0
-// @description  全维度环境隔离+指纹伪装
+// @description  全维度环境隔离+指纹伪装，支持多域名
 // @author       YourName
 // @match        https://chat100.ai/*
+// @match        https://chatai.baizebb.buzz/*
 // @grant        GM_xmlhttpRequest
 // @grant        GM_download
 // @grant        GM_addStyle
@@ -18,6 +19,24 @@
 
 (function() {
     'use strict';
+
+    // Define domain configurations
+    const DOMAIN_CONFIG = {
+        'chat100.ai': {
+            baseUrl: 'https://chat100.ai/zh-CN/app',
+            cleanUrl: 'https://chat100.ai/zh-CN/app/7daeec0724d85cde5bde0600a05df738'
+        },
+        'chatai.baizebb.buzz': {
+            baseUrl: 'https://chatai.baizebb.buzz/app',
+            cleanUrl: 'https://chatai.baizebb.buzz/app'
+        }
+    };
+
+    // Get current domain configuration
+    const getCurrentDomainConfig = () => {
+        const hostname = window.location.hostname;
+        return DOMAIN_CONFIG[hostname] || DOMAIN_CONFIG['chat100.ai']; // fallback to chat100.ai
+    };
 
     // 环境隔离容器
     class EnvIsolator {
@@ -225,7 +244,8 @@
 
     // 功能绑定
     document.getElementById('hard-reset').addEventListener('click', () => {
-        window.location.href = `https://chat100.ai/zh-CN/app/7daeec0724d85cde5bde0600a05df738?_clean=${Date.now()}`;
+        const config = getCurrentDomainConfig();
+        window.location.href = `${config.cleanUrl}?_clean=${Date.now()}`;
     });
 
     document.getElementById('new-identity').addEventListener('click', () => {
@@ -237,11 +257,20 @@
     });
 
     document.getElementById('flush-dns').addEventListener('click', () => {
-        // 这里添加刷新 DNS 缓存的逻辑
+        // DNS刷新逻辑可以在这里添加
+        fetch('http://localhost:8080/flush-dns', {
+            method: 'POST'
+        }).then(() => {
+            console.log('DNS cache flushed');
+            window.location.reload();
+        }).catch(err => {
+            console.error('Failed to flush DNS:', err);
+        });
     });
 
     // 添加回到首页按钮的功能
     document.getElementById('home-page').addEventListener('click', () => {
-        window.location.href = 'https://chat100.ai/zh-CN/app';
+        const config = getCurrentDomainConfig();
+        window.location.href = config.baseUrl;
     });
 })();
