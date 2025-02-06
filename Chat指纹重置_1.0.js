@@ -1,11 +1,10 @@
 // ==UserScript==
-// @name         Chat指纹重置
+// @name         Chat指纹重置1.3
 // @namespace    http://tampermonkey.net/
 // @version      1.0
 // @description  全维度环境隔离+指纹伪装，支持多域名
 // @author       YourName
 // @match        https://chat100.ai/*
-// @match        https://chatai.baizebb.buzz/*
 // @grant        GM_xmlhttpRequest
 // @grant        GM_download
 // @grant        GM_addStyle
@@ -25,10 +24,6 @@
         'chat100.ai': {
             baseUrl: 'https://chat100.ai/zh-CN/app',
             cleanUrl: 'https://chat100.ai/zh-CN/app/7daeec0724d85cde5bde0600a05df738'
-        },
-        'chatai.baizebb.buzz': {
-            baseUrl: 'https://chatai.baizebb.buzz/app',
-            cleanUrl: 'https://chatai.baizebb.buzz/app'
         }
     };
 
@@ -42,6 +37,7 @@
     class EnvIsolator {
         constructor() {
             this.sessionID = Date.now().toString(36) + Math.random().toString(36).substr(2);
+            this.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
             this.init();
         }
 
@@ -50,6 +46,7 @@
             this.injectFakeParameters();
             this.blockAdvancedAPIs();
             this.setupNetworkProxy();
+            this.optimizeForMobile();
         }
 
         // 清除所有历史痕迹
@@ -88,15 +85,19 @@
             // 动态硬件参数
             const hardwareProfile = {
                 deviceMemory: _.sample([4, 8, 16]),
-                hardwareConcurrency: _.random(2, 8),
-                renderer: `ANGLE (${_.sample(['NVIDIA', 'AMD'])} ${_.sample(['RTX 3080', 'RX 6900 XT'])} Direct3D11 vs_5_0 ps_5_0)`,
+                hardwareConcurrency: this.isMobile ? _.sample([2, 4]) : _.random(2, 8),
+                renderer: this.isMobile ?
+                    `ANGLE (${_.sample(['Qualcomm', 'Apple'])} ${_.sample(['Adreno', 'PowerVR'])} Direct3D11 vs_5_0 ps_5_0)` :
+                    `ANGLE (${_.sample(['NVIDIA', 'AMD'])} ${_.sample(['RTX 3080', 'RX 6900 XT'])} Direct3D11 vs_5_0 ps_5_0)`,
                 audioContextHash: _.random(1000000, 9999999).toString(16)
             };
 
             Object.defineProperties(navigator, {
                 deviceMemory: { value: hardwareProfile.deviceMemory },
                 hardwareConcurrency: { value: hardwareProfile.hardwareConcurrency },
-                userAgent: { value: `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${_.random(120, 125)}.0.0.0 Safari/537.36` }
+                userAgent: { value: this.isMobile ?
+                    `Mozilla/5.0 (${this.isAndroid() ? 'Linux; Android 10' : 'iPhone; CPU iPhone OS 14_7_1 like Mac OS X'}) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.1 Mobile/15E148 Safari/604.1` :
+                    `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${_.random(120, 125)}.0.0.0 Safari/537.36` }
             });
 
             // WebGL参数覆盖
@@ -118,6 +119,10 @@
                 oscillator.frequency.value += _.random(-10, 10);
                 return oscillator;
             };
+        }
+
+        isAndroid() {
+            return /Android/i.test(navigator.userAgent);
         }
 
         // 拦截高级API
@@ -151,6 +156,47 @@
                 });
             });
         }
+
+        // 移动端优化
+        optimizeForMobile() {
+            if (this.isMobile) {
+                // 添加viewport meta标签
+                const viewportMeta = document.createElement('meta');
+                viewportMeta.name = 'viewport';
+                viewportMeta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
+                document.head.appendChild(viewportMeta);
+
+                // 添加移动端触控优化样式
+                GM_addStyle(`
+                    * {
+                        touch-action: manipulation;
+                    }
+                    body {
+                        -webkit-overflow-scrolling: touch;
+                    }
+                `);
+
+                // 调整控制面板样式
+                GM_addStyle(`
+                    #env-control-trigger {
+                        width: 32px;
+                        height: 32px;
+                        bottom: 10px;
+                        right: 10px;
+                    }
+                    #env-control-panel {
+                        bottom: 50px;
+                        right: 10px;
+                        padding: 4px;
+                    }
+                    .env-control-btn {
+                        width: 120px;
+                        font-size: 12px;
+                        padding: 4px;
+                    }
+                `);
+            }
+        }
     }
 
     // 初始化环境隔离
@@ -160,8 +206,9 @@
     GM_addStyle(`
         #env-control-trigger {
             position: fixed;
-            bottom: 20px;
             right: 20px;
+            top: 50%; /* 将按钮定位到页面垂直中间 */
+            transform: translateY(-50%); /* 确保按钮垂直居中 */
             width: 40px;
             height: 40px;
             background: rgba(30,30,30,0.9);
@@ -176,12 +223,13 @@
             transition: all 0.3s;
         }
         #env-control-trigger:hover {
-            transform: scale(1.1);
+            transform: translateY(-50%) scale(1.1); /* 保持居中并缩放 */
         }
         #env-control-panel {
             position: fixed;
-            bottom: 70px;
             right: 20px;
+            top: 50%; /* 将面板定位到页面垂直中间 */
+            transform: translateY(-50%); /* 确保面板垂直居中 */
             background: rgba(30,30,30,0.9);
             border-radius: 8px;
             padding: 8px;
