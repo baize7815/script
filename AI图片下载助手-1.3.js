@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         AI图片下载助手(支持即梦AI/豆包AI)
+// @name         AI图片下载助手-移动端支持
 // @namespace    http://tampermonkey.net/
-// @version      1.2
-// @description  下载即梦AI和豆包AI的无水印大图和视频
+// @version      1.3.1
+// @description  下载即梦AI和豆包AI的无水印大图和视频,支持手机端
 // @author       You
 // @match        https://jimeng.jianying.com/*
 // @match        https://www.doubao.com/chat/*
@@ -17,7 +17,7 @@
 (function() {
     'use strict';
 
-    // 添加样式
+    // 添加样式(增加了移动端适配)
     GM_addStyle(`
         .download-btn {
             position: fixed;
@@ -38,6 +38,14 @@
             transition: all 0.3s;
             padding: 0;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            /* 移动端适配 */
+            @media (max-width: 768px) {
+                width: 50px;
+                height: 50px;
+                right: 15px;
+                top: 85%;
+                transform: translateY(0);
+            }
         }
         .download-btn:hover {
             background: #45a049;
@@ -88,6 +96,15 @@
         </svg>
     `;
 
+    // 错误图标SVG
+    const errorIcon = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12" y2="16"/>
+        </svg>
+    `;
+
     // 检查页面类型和平台
     function checkPageType() {
         const url = window.location.href;
@@ -111,7 +128,7 @@
             return previewImg.src;
         }
 
-        // 如果没有预览图，则获取对话中的图片
+        // 如果没有预览图,则获取对话中的图片
         const images = document.querySelectorAll('img[src*="imagex-sign.byteimg.com"]');
         for (const img of images) {
             if (img.src && !img.src.includes('avatar')) {
@@ -119,7 +136,7 @@
             }
         }
 
-        // 如果上面都没找到，尝试其他可能的选择器
+        // 如果上面都没找到,尝试其他可能的选择器
         const allImages = document.querySelectorAll('img[src*="byteimg.com"]');
         for (const img of allImages) {
             if (img.src &&
@@ -130,6 +147,15 @@
             }
         }
 
+        return null;
+    }
+
+    // 获取即夢AI图片URL
+    function getJimengImageUrl() {
+        const image = document.querySelector('.image-origin > img, .preview-image img, video');
+        if (image && image.src) {
+            return image.src;
+        }
         return null;
     }
 
@@ -154,13 +180,13 @@
             return '';
         }
 
-        // 原有的即梦AI逻辑
+        // 即夢AI平台的描述词提取
         const descElement = document.querySelector('.image-description, .prompt-text, [class*="description"], [class*="prompt"]');
         if (descElement) {
             const text = descElement.textContent.trim();
-            const match = text.match(/图片描述词[：:]\s*(.+)/);
+            const match = text.match(/(描述|提示)词[::]\s*(.+)/);
             if (match) {
-                return match[1].trim()
+                return match[2].trim()
                     .replace(/[<>:"/\\|?*]/g, '')
                     .replace(/\s+/g, '_')
                     .slice(0, 100);
@@ -361,7 +387,7 @@
     // 显示错误状态
     function showError(btn, error) {
         console.error('下载出错:', error);
-        alert(error.message || '下载失败，请重试');
+        alert(error.message || '下载失败,请重试');
         btn.disabled = false;
         btn.innerHTML = downloadIcon;
         btn.classList.remove('success');
@@ -379,8 +405,8 @@
         btn.disabled = true;
         btn.innerHTML = `<span class="loading"></span>`;
 
-        const pageType = checkPageType();
-        if (pageType === 'video') {
+        const { type } = checkPageType();
+        if (type === 'video') {
             await handleVideoDownload(btn);
         } else {
             await handleImageDownload(btn);
@@ -408,8 +434,9 @@
             // 检查是否有预览图片或普通图片
             const hasPreviewImage = document.querySelector('.semi-image-preview-image-img');
             const hasNormalImage = document.querySelector('img[src*="imagex-sign.byteimg.com"]');
+            const hasVideo = document.querySelector('video');
 
-            if (hasPreviewImage || hasNormalImage) {
+            if (hasPreviewImage || hasNormalImage || hasVideo) {
                 createOrUpdateButton();
             } else {
                 const btn = document.querySelector('.download-btn');
@@ -431,4 +458,8 @@
         childList: true,
         subtree: true
     });
+
+    // 初始化检查
+    createOrUpdateButton();
 })();
+
