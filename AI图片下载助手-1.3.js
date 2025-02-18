@@ -122,31 +122,32 @@
 
     // 获取豆包AI图片URL
     function getDoubaoImageUrl() {
-        // 首先尝试获取预览图片
+        // 首先尝试获取AI生成的图片
+        const images = document.querySelectorAll('img[src*="byteimg.com"]');
+        for (const img of images) {
+            if (img.src && 
+                img.src.includes('image_skill') && 
+                img.src.includes('image-dark-watermark')) {
+                return img.src;
+            }
+        }
+    
+        // 如果没有找到AI生成的图片，再尝试获取预览图片
         const previewImg = document.querySelector('.semi-image-preview-image-img');
         if (previewImg && previewImg.src) {
             return previewImg.src;
         }
-
-        // 如果没有预览图,则获取对话中的图片
-        const images = document.querySelectorAll('img[src*="imagex-sign.byteimg.com"]');
+    
+        // 最后尝试获取其他普通图片
         for (const img of images) {
-            if (img.src && !img.src.includes('avatar')) {
-                return img.src;
-            }
-        }
-
-        // 如果上面都没找到,尝试其他可能的选择器
-        const allImages = document.querySelectorAll('img[src*="byteimg.com"]');
-        for (const img of allImages) {
-            if (img.src &&
-                !img.src.includes('avatar') &&
-                !img.src.includes('emoji') &&
+            if (img.src && 
+                !img.src.includes('avatar') && 
+                !img.src.includes('emoji') && 
                 !img.src.includes('icon')) {
                 return img.src;
             }
         }
-
+    
         return null;
     }
 
