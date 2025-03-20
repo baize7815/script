@@ -1,0 +1,5 @@
+[fa:Light_Cog]设置|设置
+[fa:Light_Cog]提示词|提示词
+[+][fa:Light_Tools:#49d4be]模式选择
+[-][fa:Light_ChessPawnAlt]文本|text_mode
+[-][fa:Light_Dharmachakra]截图|img_mode
