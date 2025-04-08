@@ -1,0 +1,569 @@
+// AI图片下载助手 - 豆包AI专用版 
+(function() {
+    'use strict';
+    
+    console.log('AI下载助手脚本已加载');
+    
+    // 添加样式
+    function addStyles() {
+        const style = document.createElement('style');
+        style.textContent = `
+            .ai-download-btn {
+                position: fixed;
+                right: 20px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 40px;
+                height: 40px;
+                background: #4CAF50;
+                color: white;
+                border: none;
+                border-radius: 50%;
+                cursor: pointer;
+                z-index: 999999;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                transition: all 0.3s;
+            }
+            .ai-download-btn:hover {
+                background: #45a049;
+                transform: translateY(-50%) scale(1.1);
+            }
+            .ai-download-btn.loading {
+                background: #FFA500;
+            }
+            .ai-download-btn.success {
+                background: #45a049;
+            }
+            .ai-download-btn.error {
+                background: #f44336;
+            }
+            .ai-download-btn svg {
+                width: 16px;
+                height: 16px;
+            }
+            .ai-download-btn .spinner {
+                width: 18px;
+                height: 18px;
+                border: 2px solid rgba(255,255,255,0.3);
+                border-radius: 50%;
+                border-top-color: white;
+                animation: spin 1s ease-in-out infinite;
+            }
+            @keyframes spin {
+                to { transform: rotate(360deg); }
+            }
+            .ai-toast {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: rgba(0,0,0,0.8);
+                color: white;
+                padding: 10px 20px;
+                border-radius: 4px;
+                z-index: 999999;
+                max-width: 300px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+                transition: all 0.3s;
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            .ai-toast.show {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        `;
+        document.head.appendChild(style);
+        console.log('样式已添加');
+    }
+    
+    // 显示提示消息
+    function showToast(message, duration = 3000) {
+        let toast = document.querySelector('.ai-toast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.className = 'ai-toast';
+            document.body.appendChild(toast);
+        }
+        
+        toast.textContent = message;
+        toast.classList.add('show');
+        
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, duration);
+    }
+    
+    // 获取豆包AI图片URL
+    function getDoubaoImageUrl() {
+        console.log('开始查找豆包AI高清无水印图片...');
+        
+        // 查找所有可能的图片元素
+        const allImages = Array.from(document.querySelectorAll('img'));
+        console.log(`找到${allImages.length}个图片元素`);
+        
+        // 记录所有图片的URL和尺寸
+        allImages.forEach((img, index) => {
+            if (img.src) {
+                console.log(`图片${index}: ${img.src}, 尺寸: ${img.width}x${img.height}`);
+            }
+        });
+        
+        // 查找特定的豆包AI生成图片
+        const aiGeneratedImages = allImages.filter(img => {
+            return img.src && 
+                   (img.src.includes('byteimg.com') || img.src.includes('imagex')) && 
+                   !img.src.includes('avatar') && 
+                   !img.src.includes('emoji') && 
+                   !img.src.includes('icon') &&
+                   img.width > 200 && 
+                   img.height > 200;
+        });
+        
+        console.log(`找到${aiGeneratedImages.length}个可能的AI生成图片`);
+        
+        // 按尺寸排序，优先选择最大的图片
+        const sortedImages = aiGeneratedImages.sort((a, b) => {
+            const areaA = a.width * a.height;
+            const areaB = b.width * b.height;
+            return areaB - areaA; // 降序排列
+        });
+        
+        if (sortedImages.length > 0) {
+            const largestImg = sortedImages[0];
+            console.log(`选择最大的图片: ${largestImg.src}, 尺寸: ${largestImg.width}x${largestImg.height}`);
+            
+            // 处理图片URL，移除水印参数，确保有正确的扩展名
+            let highResUrl = largestImg.src;
+            
+            // 移除查询参数，获取基本URL
+            const baseUrl = highResUrl.split('?')[0];
+            
+            // 检查URL是否包含文件扩展名
+            const hasExtension = /\.(jpg|jpeg|png|gif|webp)$/i.test(baseUrl);
+            
+            // 如果没有扩展名，添加.png扩展名
+            if (!hasExtension) {
+                console.log('图片URL没有扩展名，添加.png扩展名');
+                highResUrl = highResUrl.replace(/(\?|$)/, '.png$1');
+            }
+            
+            // 移除水印相关参数
+            highResUrl = highResUrl.replace(/image-dark-watermark/g, 'image');
+            highResUrl = highResUrl.replace(/~\d+x\d+\.image/g, '.image');
+            
+            // 移除其他可能的限制参数
+            highResUrl = highResUrl.replace(/format=webp/g, 'format=png');
+            highResUrl = highResUrl.replace(/quality=\d+/g, 'quality=100');
+            
+            console.log('处理后的高清图片URL:', highResUrl);
+            
+            return {
+                url: highResUrl,
+                element: largestImg,
+                originalUrl: largestImg.src
+            };
+        }
+        
+        // 尝试从预览模式获取
+        const previewImg = document.querySelector('.semi-image-preview-image-img');
+        if (previewImg && previewImg.src) {
+            console.log('找到预览图片:', previewImg.src);
+            
+            // 处理预览图片URL
+            let highResUrl = previewImg.src;
+            
+            // 移除查询参数，获取基本URL
+            const baseUrl = highResUrl.split('?')[0];
+            
+            // 检查URL是否包含文件扩展名
+            const hasExtension = /\.(jpg|jpeg|png|gif|webp)$/i.test(baseUrl);
+            
+            // 如果没有扩展名，添加.png扩展名
+            if (!hasExtension) {
+                console.log('预览图片URL没有扩展名，添加.png扩展名');
+                highResUrl = highResUrl.replace(/(\?|$)/, '.png$1');
+            }
+            
+            // 移除水印相关参数
+            highResUrl = highResUrl.replace(/image-dark-watermark/g, 'image');
+            highResUrl = highResUrl.replace(/~\d+x\d+\.image/g, '.image');
+            
+            // 移除其他可能的限制参数
+            highResUrl = highResUrl.replace(/format=webp/g, 'format=png');
+            highResUrl = highResUrl.replace(/quality=\d+/g, 'quality=100');
+            
+            console.log('处理后的预览图片URL:', highResUrl);
+            
+            return {
+                url: highResUrl,
+                element: previewImg,
+                originalUrl: previewImg.src
+            };
+        }
+        
+        console.log('未找到任何可下载的图片');
+        return null;
+    }
+    
+    // 使用Canvas下载图片
+    async function downloadImageViaCanvas(imgElement, filename) {
+        try {
+            console.log('使用Canvas方法下载图片');
+            
+            // 创建一个新的图片元素，用于确保图片完全加载
+            const img = new Image();
+            img.crossOrigin = 'anonymous'; // 尝试解决跨域问题
+            
+            // 创建一个Promise来等待图片加载完成
+            const loadPromise = new Promise((resolve, reject) => {
+                img.onload = () => resolve();
+                img.onerror = (e) => reject(new Error(`图片加载失败: ${e.message}`));
+                
+                // 设置超时
+                setTimeout(() => reject(new Error('图片加载超时')), 30000);
+            });
+            
+            // 设置图片源
+            img.src = imgElement.src;
+            
+            // 等待图片加载
+            await loadPromise;
+            
+            // 创建canvas元素
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // 设置canvas尺寸与图片相同
+            canvas.width = img.naturalWidth || imgElement.naturalWidth || imgElement.width;
+            canvas.height = img.naturalHeight || imgElement.naturalHeight || imgElement.height;
+            
+            console.log(`创建Canvas: ${canvas.width}x${canvas.height}`);
+            
+            // 在canvas上绘制图片
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            
+            // 将canvas转换为Blob
+            const blobPromise = new Promise((resolve) => {
+                canvas.toBlob((blob) => {
+                    resolve(blob);
+                }, 'image/png', 1.0);
+            });
+            
+            const blob = await blobPromise;
+            
+            if (!blob) {
+                throw new Error('Canvas转换为Blob失败');
+            }
+            
+            console.log('Canvas生成Blob成功，大小:', Math.round(blob.size / 1024), 'KB');
+            
+            // 创建下载链接
+            const blobUrl = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = blobUrl;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            
+            // 清理Blob URL
+            setTimeout(() => {
+                URL.revokeObjectURL(blobUrl);
+            }, 1000);
+            
+            console.log('Canvas下载完成');
+            return true;
+        } catch (error) {
+            console.error('Canvas下载过程中发生错误:', error);
+            throw error;
+        }
+    }
+    
+    // 直接下载图片
+    async function downloadImageDirect(url, filename) {
+        try {
+            console.log('使用直接下载方法:', url);
+            
+            // 创建下载链接
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.target = '_blank'; // 尝试在新窗口打开，可能有助于绕过某些限制
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            
+            console.log('直接下载完成');
+            return true;
+        } catch (error) {
+            console.error('直接下载过程中发生错误:', error);
+            throw error;
+        }
+    }
+    
+    // 使用Fetch API下载图片
+    async function downloadImageViaFetch(url, filename) {
+        try {
+            console.log('使用Fetch API下载图片:', url);
+            
+            // 添加必要的请求头以绕过防盗链
+            const response = await fetch(url, {
+                headers: {
+                    'Referer': 'https://www.doubao.com/',
+                    'Origin': 'https://www.doubao.com',
+                    'User-Agent': navigator.userAgent,
+                    'Accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8'
+                },
+                credentials: 'include'
+            });
+            
+            if (!response.ok) {
+                throw new Error(`下载失败: ${response.status} ${response.statusText}`);
+            }
+            
+            const blob = await response.blob();
+            console.log('图片下载成功，大小:', Math.round(blob.size / 1024), 'KB');
+            
+            // 创建下载链接
+            const blobUrl = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = blobUrl;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            
+            // 清理Blob URL
+            setTimeout(() => {
+                URL.revokeObjectURL(blobUrl);
+            }, 1000);
+            
+            return true;
+        } catch (error) {
+            console.error('Fetch下载过程中发生错误:', error);
+            throw error;
+        }
+    }
+    
+    // 处理下载按钮点击
+    async function handleDownloadClick() {
+        // 成功图标SVG
+        const successIcon = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+        <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+        `;
+    
+        // 错误图标SVG
+        const errorIcon = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12" y2="16"/>
+        </svg>
+        `;
+        
+        // 下载图标SVG
+        const downloadIcon = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/>
+        <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        `;
+    
+        const btn = document.querySelector('.ai-download-btn');
+        if (!btn || btn.classList.contains('loading')) return;
+        
+        // 设置按钮为加载状态
+        btn.innerHTML = '<div class="spinner"></div>';
+        btn.classList.add('loading');
+        
+        try {
+            // 获取图片信息
+            const imageInfo = getDoubaoImageUrl();
+            if (!imageInfo) {
+                throw new Error('未找到可下载的图片');
+            }
+            
+            showToast('正在下载图片...');
+            console.log('准备下载图片:', imageInfo.url);
+            
+            // 生成文件名
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-').substring(0, 19);
+            const filename = `豆包AI_${timestamp}.png`;
+            
+            // 尝试多种下载方法
+            let success = false;
+            
+            // 方法1: 使用Canvas方法
+            try {
+                if (imageInfo.element) {
+                    await downloadImageViaCanvas(imageInfo.element, filename);
+                    success = true;
+                    console.log('Canvas下载成功');
+                }
+            } catch (e) {
+                console.error('Canvas下载失败:', e);
+                showToast('尝试其他下载方法...');
+            }
+            
+            // 方法2: 如果Canvas方法失败，尝试直接下载
+            if (!success) {
+                try {
+                    await downloadImageDirect(imageInfo.url, filename);
+                    success = true;
+                    console.log('直接下载成功');
+                } catch (e) {
+                    console.error('直接下载失败:', e);
+                    showToast('尝试最后的下载方法...');
+                }
+            }
+            
+            // 方法3: 如果前两种方法都失败，尝试使用Fetch API
+            if (!success) {
+                try {
+                    await downloadImageViaFetch(imageInfo.url, filename);
+                    success = true;
+                    console.log('Fetch下载成功');
+                } catch (e) {
+                    console.error('Fetch下载失败:', e);
+                    throw new Error('所有下载方法都失败');
+                }
+            }
+            
+            // 设置按钮为成功状态
+            btn.innerHTML = successIcon;
+            btn.classList.remove('loading');
+            btn.classList.add('success');
+            showToast('图片下载成功！');
+            
+            // 恢复按钮状态
+            setTimeout(() => {
+                btn.innerHTML = downloadIcon;
+                btn.classList.remove('success');
+            }, 2000);
+            
+        } catch (error) {
+            console.error('下载失败:', error);
+            
+            // 设置按钮为错误状态
+            btn.innerHTML = errorIcon;
+            btn.classList.remove('loading');
+            btn.classList.add('error');
+            showToast(`下载失败: ${error.message}`);
+            
+            // 恢复按钮状态
+            setTimeout(() => {
+                btn.innerHTML = downloadIcon;
+                btn.classList.remove('error');
+            }, 2000);
+        }
+    }
+    
+    // 创建下载按钮
+    // 在文件顶部添加SVG图标定义
+    function createDownloadButton() {
+    // 下载图标SVG
+    const downloadIcon = `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+    <polyline points="7 10 12 15 17 10"/>
+    <line x1="12" y1="15" x2="12" y2="3"/>
+    </svg>
+    `;
+    
+    // 检查按钮是否已存在
+    if (document.querySelector('.ai-download-btn')) {
+        console.log('按钮已存在，不重复创建');
+        return;
+    }
+    
+    console.log('创建下载按钮');
+    const btn = document.createElement('button');
+    btn.className = 'ai-download-btn';
+    btn.innerHTML = downloadIcon;
+    btn.title = '下载高清无水印图片';
+    btn.addEventListener('click', handleDownloadClick);
+    
+    document.body.appendChild(btn);
+    console.log('下载按钮已添加到页面');
+    }
+    
+    // 监听页面变化
+    function observePageChanges() {
+        const observer = new MutationObserver((mutations) => {
+            // 检查是否有图片元素变化
+            const hasImageChanges = mutations.some(mutation => {
+                return Array.from(mutation.addedNodes).some(node => {
+                    if (node.nodeType === 1) { // 元素节点
+                        return node.tagName === 'IMG' || 
+                               node.querySelector('img') !== null ||
+                               node.classList && (
+                                   node.classList.contains('semi-image-preview') ||
+                                   node.classList.contains('image-container')
+                               );
+                    }
+                    return false;
+                });
+            });
+            
+            // 如果有图片变化，确保按钮存在
+            if (hasImageChanges) {
+                console.log('检测到图片变化，确保下载按钮存在');
+                if (!document.querySelector('.ai-download-btn')) {
+                    createDownloadButton();
+                }
+            }
+            
+            // 如果按钮不存在，重新创建
+            if (!document.querySelector('.ai-download-btn')) {
+                createDownloadButton();
+            }
+        });
+        
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            attributeFilter: ['src', 'style', 'class']
+        });
+        
+        console.log('页面变化监听器已启动');
+    }
+    
+    // 初始化函数
+    function init() {
+        console.log('初始化AI下载助手');
+        addStyles();
+        createDownloadButton();
+        observePageChanges();
+        
+        // 在控制台提供调试函数
+        window.debugAIDownloader = {
+            getImageUrl: getDoubaoImageUrl,
+            downloadViaCanvas: downloadImageViaCanvas,
+            downloadDirect: downloadImageDirect,
+            downloadViaFetch: downloadImageViaFetch,
+            showToast: showToast
+        };
+        
+        console.log('AI下载助手初始化完成，可以通过window.debugAIDownloader进行调试');
+    }
+    
+    // 如果DOM已加载完成，直接执行；否则等待DOM加载
+    if (document.readyState === 'loading') {
+        console.log('等待DOM加载完成');
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        console.log('DOM已加载，直接初始化');
+        init();
+    }
+    
+    // 为了确保脚本在任何情况下都能执行，添加一个延迟执行
+    setTimeout(init, 2000);
+})();
