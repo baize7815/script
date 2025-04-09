@@ -1,0 +1,497 @@
+// AI图片下载助手 - 即梦AI专用版 
+(function() {
+    'use strict';
+    
+    console.log('即梦AI下载助手脚本已加载');
+    
+    // 定义SVG图标
+    const downloadIcon = `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+    <polyline points="7 10 12 15 17 10"/>
+    <line x1="12" y1="15" x2="12" y2="3"/>
+    </svg>
+    `;
+
+    const successIcon = `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+    <polyline points="22 4 12 14.01 9 11.01"/>
+    </svg>
+    `;
+
+    const errorIcon = `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="10"/>
+    <line x1="12" y1="8" x2="12" y2="12"/>
+    <line x1="12" y1="16" x2="12" y2="16"/>
+    </svg>
+    `;
+    
+    // 添加样式 - 修改按钮样式和位置
+    function addStyles() {
+        const style = document.createElement('style');
+        style.textContent = `
+            .ai-download-btn {
+                position: fixed;
+                right: 80px;
+                bottom: 80px;
+                width: 30px;
+                height: 30px;
+                background: #4CAF50;
+                color: white;
+                border: none;
+                border-radius: 50%;
+                cursor: pointer;
+                z-index: 2147483647;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+                transition: all 0.3s;
+                pointer-events: auto !important;
+            }
+            .ai-download-btn:hover {
+                background: #45a049;
+                transform: scale(1.1);
+            }
+            .ai-download-btn.loading {
+                background: #FFA500;
+            }
+            .ai-download-btn.success {
+                background: #45a049;
+            }
+            .ai-download-btn.error {
+                background: #f44336;
+            }
+            .ai-download-btn svg {
+                width: 16px;
+                height: 16px;
+            }
+            .ai-download-btn .spinner {
+                width: 16px;
+                height: 16px;
+                border: 2px solid rgba(255,255,255,0.3);
+                border-radius: 50%;
+                border-top-color: white;
+                animation: spin 1s ease-in-out infinite;
+            }
+            @keyframes spin {
+                to { transform: rotate(360deg); }
+            }
+            .ai-toast {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: rgba(0,0,0,0.8);
+                color: white;
+                padding: 10px 20px;
+                border-radius: 4px;
+                z-index: 2147483647;
+                max-width: 300px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+                transition: all 0.3s;
+                opacity: 0;
+                transform: translateY(-20px);
+                pointer-events: none;
+            }
+            .ai-toast.show {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        `;
+        document.head.appendChild(style);
+        console.log('样式已添加');
+    }
+    
+    // 显示提示消息
+    function showToast(message, duration = 3000) {
+        let toast = document.querySelector('.ai-toast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.className = 'ai-toast';
+            document.body.appendChild(toast);
+        }
+        
+        toast.textContent = message;
+        toast.classList.add('show');
+        
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, duration);
+    }
+
+    // 检查页面类型
+    function checkPageType() {
+        const url = window.location.href;
+        if (url.includes('doubao.com')) {
+            return { platform: 'doubao' };
+        } else if (url.includes('dreamina')) {
+            return { platform: 'dreamina' };
+        } else {
+            return { platform: 'jimeng' }; // 默认为即梦AI
+        }
+    }
+
+    // 获取即夢AI图片URL - 简化并参考豆包.js的方法
+    function getJimengImageUrl() {
+        console.log('开始查找即梦AI高清无水印图片...');
+        
+        // 查找所有图片元素
+        const allImages = Array.from(document.querySelectorAll('img'));
+        console.log(`找到${allImages.length}个图片元素`);
+        
+        // 记录所有图片的URL和尺寸
+        allImages.forEach((img, index) => {
+            if (img.src) {
+                console.log(`图片${index}: ${img.src}, 尺寸: ${img.width}x${img.height}`);
+            }
+        });
+        
+        // 筛选可能的AI生成图片
+        const aiGeneratedImages = allImages.filter(img => {
+            return img.src && 
+                   (img.src.includes('byteimg.com') || 
+                    img.src.includes('tos-cn') || 
+                    img.src.includes('jianying')) && 
+                   !img.src.includes('avatar') && 
+                   !img.src.includes('emoji') && 
+                   !img.src.includes('icon') &&
+                   img.width > 200 && 
+                   img.height > 200;
+        });
+        
+        console.log(`找到${aiGeneratedImages.length}个可能的AI生成图片`);
+        
+        // 按尺寸排序，优先选择最大的图片
+        const sortedImages = aiGeneratedImages.sort((a, b) => {
+            const areaA = a.width * a.height;
+            const areaB = b.width * b.height;
+            return areaB - areaA; // 降序排列
+        });
+        
+        if (sortedImages.length > 0) {
+            const largestImg = sortedImages[0];
+            console.log(`选择最大的图片: ${largestImg.src}, 尺寸: ${largestImg.width}x${largestImg.height}`);
+            return largestImg.src;
+        }
+        
+        console.log('未找到任何有效图片');
+        return null;
+    }
+
+    // 获取图片描述词
+    function getImageDescription() {
+        // 即夢AI平台的描述词提取
+        const descElement = document.querySelector('.image-description, .prompt-text, [class*="description"], [class*="prompt"]');
+        if (descElement) {
+            const text = descElement.textContent.trim();
+            const match = text.match(/(描述|提示)词[::]*\s*(.+)/);
+            if (match) {
+                return match[2].trim()
+                    .replace(/[<>:"\/\\|?*]/g, '')
+                    .replace(/\s+/g, '_')
+                    .slice(0, 100);
+            }
+        }
+        return '';
+    }
+
+    // WebP转JPEG函数
+    async function webpToJpeg(webpBlob) {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                canvas.toBlob((blob) => {
+                    resolve(blob);
+                }, 'image/jpeg', 0.95);
+                URL.revokeObjectURL(img.src);
+            };
+            img.onerror = () => {
+                URL.revokeObjectURL(img.src);
+                reject(new Error('图片转换失败'));
+            };
+            img.src = URL.createObjectURL(webpBlob);
+        });
+    }
+
+    // 获取当前预览图片的URL
+    function getCurrentImageUrl() {
+        return getJimengImageUrl();
+    }
+
+    // 获取视频URL
+    function getVideoUrl() {
+        // 尝试多种选择器来定位视频元素
+        const videoSelectors = [
+            'video source',
+            'video[src]',
+            '[class*="player"] video',
+            '[class*="video"] video',
+            '.showcase-video video',
+            '.story-video video'
+        ];
+
+        // 首先尝试直接获取视频元素
+        for (const selector of videoSelectors) {
+            const element = document.querySelector(selector);
+            if (element) {
+                const url = element.src || element.currentSrc;
+                if (url) return url;
+            }
+        }
+
+        // 如果直接获取失败，尝试从网页内容中提取
+        const pageContent = document.documentElement.innerHTML;
+        const urlPatterns = [
+            /(https?:\/\/[^"']*vlabvod\.com[^"']*)/,
+            /(https?:\/\/[^"']*\.mp4[^"']*)/,
+            /(https?:\/\/[^"']*video[^"']*)/
+        ];
+
+        for (const pattern of urlPatterns) {
+            const match = pageContent.match(pattern);
+            if (match) return match[0];
+        }
+
+        return null;
+    }
+
+    // 显示成功状态
+    function showSuccess(btn) {
+        btn.innerHTML = successIcon;
+        btn.classList.remove('loading');
+        btn.classList.add('success');
+        showToast('图片下载成功！');
+        
+        // 恢复按钮状态
+        setTimeout(() => {
+            btn.innerHTML = downloadIcon;
+            btn.classList.remove('success');
+        }, 2000);
+    }
+
+    // 显示错误状态
+    function showError(btn, error) {
+        btn.innerHTML = errorIcon;
+        btn.classList.remove('loading');
+        btn.classList.add('error');
+        showToast(`下载失败: ${error.message}`);
+        
+        // 恢复按钮状态
+        setTimeout(() => {
+            btn.innerHTML = downloadIcon;
+            btn.classList.remove('error');
+        }, 2000);
+    }
+
+    // 处理图片下载
+    async function handleImageDownload(btn) {
+        try {
+            console.log('开始处理图片下载...');
+            const originalUrl = getCurrentImageUrl();
+            console.log('获取到的图片URL:', originalUrl);
+            if (!originalUrl) {
+                console.error('获取图片URL失败');
+                throw new Error('未找到可下载的图片');
+            }
+
+            console.log('开始下载图片...');
+            
+            // 检查GM_xmlhttpRequest是否可用
+            if (typeof GM_xmlhttpRequest === 'undefined') {
+                console.log('GM_xmlhttpRequest不可用，使用fetch方法下载');
+                try {
+                    const response = await fetch(originalUrl, {
+                        headers: {
+                            'Referer': window.location.href,
+                            'Origin': window.location.origin
+                        }
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`下载失败: ${response.status}`);
+                    }
+                    
+                    const blob = await response.blob();
+                    const url = URL.createObjectURL(blob);
+                    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+                    const filename = `即梦AI_${timestamp}.jpg`;
+                    
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+
+                    showSuccess(btn);
+                } catch (error) {
+                    throw new Error('Fetch下载失败：' + error.message);
+                }
+                return;
+            }
+            
+            // 使用GM_xmlhttpRequest下载图片
+            GM_xmlhttpRequest({
+                method: 'GET',
+                url: originalUrl,
+                responseType: 'blob',
+                headers: {
+                    'Referer': window.location.href,
+                    'Origin': window.location.origin,
+                    'Accept': 'image/webp,image/*,*/*;q=0.8',
+                    'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
+                    'Cache-Control': 'no-cache',
+                    'Pragma': 'no-cache',
+                    'User-Agent': navigator.userAgent
+                },
+                onload: async function(response) {
+                    console.log('图片下载成功，状态码:', response.status);
+                    try {
+                        if (response.status !== 200) {
+                            throw new Error('图片下载失败');
+                        }
+
+                        let finalBlob = response.response;
+                        // 检查是否为WebP格式
+                        if (originalUrl.toLowerCase().includes('webp') || response.response.type === 'image/webp') {
+                            finalBlob = await webpToJpeg(response.response);
+                        }
+
+                        const url = URL.createObjectURL(finalBlob);
+                        const description = getImageDescription();
+                        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+                        const filename = description
+                            ? `${description}.jpg`
+                            : `即梦AI_${timestamp}.jpg`;
+
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = filename;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+
+                        showSuccess(btn);
+                    } catch (error) {
+                        throw new Error('图片处理失败：' + error.message);
+                    }
+                },
+                onerror: function() {
+                    throw new Error('网络请求失败');
+                }
+            });
+        } catch (error) {
+            console.error('下载过程中发生错误:', error);
+            console.error('错误堆栈:', error.stack);
+            showError(btn, error);
+        }
+    }
+
+    // 处理下载按钮点击
+    function handleDownload() {
+        const btn = document.querySelector('.ai-download-btn');
+        if (!btn || btn.classList.contains('loading')) return;
+        
+        // 设置按钮为加载状态
+        btn.innerHTML = '<div class="spinner"></div>';
+        btn.classList.add('loading');
+        
+        handleImageDownload(btn);
+    }
+
+    // 创建下载按钮 - 修改按钮创建方式
+    function createDownloadButton() {
+        // 检查按钮是否已存在
+        if (document.querySelector('.ai-download-btn')) {
+            console.log('按钮已存在，不重复创建');
+            return;
+        }
+        
+        console.log('创建下载按钮');
+        const btn = document.createElement('button');
+        btn.className = 'ai-download-btn';
+        btn.innerHTML = downloadIcon;
+        btn.title = '下载高清无水印图片';
+        btn.addEventListener('click', handleDownload);
+        
+        // 确保按钮在页面上可见
+        btn.style.position = 'fixed';
+        btn.style.right = '80px';
+        btn.style.bottom = '80px';
+        btn.style.zIndex = '2147483647'; // 最大z-index值
+        
+        // 添加到body的最后，确保在最上层
+        document.body.appendChild(btn);
+        console.log('下载按钮已添加到页面，位置:', btn.style.right, btn.style.bottom);
+        
+        // 添加调试信息
+        showToast('即梦AI下载助手已启动');
+    }
+    
+    // 监听页面变化 - 简化并使用更可靠的方法
+    function observePageChanges() {
+        // 立即创建按钮
+        createDownloadButton();
+        
+        // 使用轮询方式确保按钮存在
+        const buttonCheckInterval = setInterval(() => {
+            if (!document.querySelector('.ai-download-btn')) {
+                console.log('按钮不存在，重新创建');
+                createDownloadButton();
+            }
+        }, 2000);
+        
+        // 保存interval ID以便清理
+        window._aiDownloadButtonInterval = buttonCheckInterval;
+        
+        console.log('按钮检查定时器已启动');
+    }
+    
+    // 初始化函数 - 简化并确保在正确的网站上运行
+    function init() {
+        console.log('初始化即梦AI下载助手');
+        console.log('当前URL:', window.location.href);
+        
+        // 检查是否在即梦AI网站
+        if (window.location.href.includes('jimeng.jianying.com')) {
+            console.log('检测到即梦AI网站，开始执行脚本');
+            
+            // 清除可能存在的旧定时器
+            if (window._aiDownloadButtonInterval) {
+                clearInterval(window._aiDownloadButtonInterval);
+            }
+            
+            // 移除可能存在的旧按钮
+            const oldBtn = document.querySelector('.ai-download-btn');
+            if (oldBtn) {
+                oldBtn.remove();
+            }
+            
+            // 添加样式和按钮
+            addStyles();
+            createDownloadButton();
+            observePageChanges();
+            
+            // 直接在页面上显示一个提示，帮助调试
+            console.log('%c即梦AI下载助手已启动', 'color: green; font-size: 20px; font-weight: bold;');
+        } else {
+            console.log('不在即梦AI网站，脚本不执行');
+        }
+    }
+    
+    // 启动脚本 - 延迟执行以确保页面加载完成
+    setTimeout(init, 1500);
+    
+    // 添加一个全局函数，方便手动触发
+    window.runJimengDownloader = init;
+})();
+
