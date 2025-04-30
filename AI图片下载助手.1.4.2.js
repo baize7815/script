@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AI图片下载助手
 // @namespace    http://tampermonkey.net/
-// @version      1.4.2
+// @version      1.4.6
 // @description  下载即梦AI和豆包AI的无水印大图和视频,支持手机端
 // @author       You
 // @match        https://jimeng.jianying.com/*
@@ -139,7 +139,7 @@
         // 过滤出豆包AI生成的大图
         const aiGeneratedImages = allImages.filter(img => {
             return img.src &&
-                (img.src.includes('byteimg.com') || img.src.includes('imagex')) &&
+                (img.src.includes('byteimg.com') || img.src.includes('imagex') || img.src.includes('doubao.com')) &&
                 !img.src.includes('avatar') &&
                 !img.src.includes('emoji') &&
                 !img.src.includes('icon') &&
@@ -155,6 +155,8 @@
         // 处理URL，去除水印参数
         return sortedImages.map(img => {
             let url = img.src;
+            // 保存原始URL用于备选方案
+            const originalUrl = url;
             const baseUrl = url.split('?')[0];
             const hasExtension = /\.(jpg|jpeg|png|gif|webp)$/i.test(baseUrl);
             if (!hasExtension) url = url.replace(/(\?|$)/, '.png$1');
@@ -162,121 +164,85 @@
             url = url.replace(/~\d+x\d+\.image/g, '.image');
             url = url.replace(/format=webp/g, 'format=png');
             url = url.replace(/quality=\d+/g, 'quality=100');
-            return url;
+            // 返回处理后的URL和原始URL
+            return { processedUrl: url, originalUrl: originalUrl };
         });
     }
 
     // 获取即夢AI图片URL
     function getJimengImageUrl() {
-        const image = document.querySelector('.image-origin > img, .preview-image img, video');
-        if (image && image.src) {
-            return image.src;
+        // 尝试获取预览大图
+        const previewImage = document.querySelector('.imageWrapper-Lc22P_ img, [role="dialog"] img, .preview-image img, .image-preview img');
+        if (previewImage && previewImage.src) {
+            // 解码HTML实体
+            const tempElement = document.createElement('div');
+            tempElement.innerHTML = previewImage.src;
+            return tempElement.textContent || tempElement.innerText || previewImage.src;
         }
+        
+        // 尝试获取页面上的其他图片
+        const images = Array.from(document.querySelectorAll('img[src*="byteimg.com"], img[src*="ibyteimg.com"]'))
+            .filter(img =>
+                img.src &&
+                !img.src.includes('avatar') &&
+                !img.src.includes('emoji') &&
+                !img.src.includes('icon') &&
+                img.width > 200 &&
+                img.height > 200
+            );
+        
+        if (images.length > 0) {
+            // 取最大宽高的那张
+            images.sort((a, b) => (b.width * b.height) - (a.width * a.height));
+            const tempElement = document.createElement('div');
+            tempElement.innerHTML = images[0].src;
+            return tempElement.textContent || tempElement.innerText || images[0].src;
+        }
+        
+        // 尝试获取页面上的其他图片（原有逻辑保留作为备选）
+        const image = document.querySelector('.image-origin > img, video');
+        if (image && image.src) {
+            // 解码HTML实体
+            const tempElement = document.createElement('div');
+            tempElement.innerHTML = image.src;
+            return tempElement.textContent || tempElement.innerText || image.src;
+        }
+        
         return null;
     }
 
     // 获取Dreamina图片URL
     function getDreaminaImageUrl() {
-        const image = document.querySelector('.image-origin > img, .preview-image img');
-        if (image && image.src) {
-            return image.src;
+        // 尝试获取预览大图
+        const previewImage = document.querySelector('.imageWrapper-Lc22P_ img, [role="dialog"] img, .preview-image img, .image-preview img');
+        if (previewImage && previewImage.src) {
+            // 解码HTML实体
+            const tempElement = document.createElement('div');
+            tempElement.innerHTML = previewImage.src;
+            const url = tempElement.textContent || tempElement.innerText || previewImage.src;
+            return { processedUrl: url, originalUrl: previewImage.src };
         }
-        return null;
-    }
-
-    // 获取图片描述词
-    function getImageDescription() {
-        const { platform } = checkPageType();
-
-        if (platform === 'doubao') {
-            const messageElements = document.querySelectorAll('.message-content');
-            for (const element of messageElements) {
-                if (element.textContent.includes('/imagine')) {
-                    const text = element.textContent.trim();
-                    const match = text.match(/\/imagine\s+(.+)/);
-                    if (match) {
-                        return match[1].trim()
-                            .replace(/[<>:"\/\\|?*]/g, '')
-                            .replace(/\s+/g, '_')
-                            .slice(0, 100);
-                    }
-                }
-            }
-            return '';
-        } else if (platform === 'dreamina') {
-            // Dreamina平台的描述词提取
-            const descElement = document.querySelector('.image-description, .prompt-text, [class*="description"], [class*="prompt"]');
-            if (descElement) {
-                const text = descElement.textContent.trim();
-                const match = text.match(/(描述|影像提示)[::]*\s*(.+)/);
-                if (match) {
-                    return match[2].trim()
-                        .replace(/[<>:"\/\\|?*]/g, '')
-                        .replace(/\s+/g, '_')
-                        .slice(0, 100);
-                }
-            }
-            return '';
-        }
-
-        // 即夢AI平台的描述词提取
-        const descElement = document.querySelector('.image-description, .prompt-text, [class*="description"], [class*="prompt"]');
-        if (descElement) {
-            const text = descElement.textContent.trim();
-            const match = text.match(/(描述|提示)词[::]*\s*(.+)/);
-            if (match) {
-                return match[2].trim()
-                    .replace(/[<>:"\/\\|?*]/g, '')
-                    .replace(/\s+/g, '_')
-                    .slice(0, 100);
-            }
-        }
-        return '';
-    }
-
-    // WebP转JPEG函数
-    async function webpToJpeg(webpBlob) {
-        return new Promise((resolve, reject) => {
-            const img = new Image();
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                canvas.width = img.width;
-                canvas.height = img.height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0);
-                canvas.toBlob((blob) => {
-                    resolve(blob);
-                }, 'image/jpeg', 0.95);
-                URL.revokeObjectURL(img.src);
-            };
-            img.onerror = () => {
-                URL.revokeObjectURL(img.src);
-                reject(new Error('图片转换失败'));
-            };
-            img.src = URL.createObjectURL(webpBlob);
-        });
-    }
-
-    // 获取豆包AI当前预览大图URL（只取你点开的那张）
-    function getDoubaoImageUrl() {
-        // 优先获取弹窗预览大图
-        const previewImg = document.querySelector('.semi-image-preview-image-img');
-        if (previewImg && previewImg.src) {
-            return previewImg.src;
-        }
-        // 其次获取页面上最大尺寸的AI图片
-        const images = Array.from(document.querySelectorAll('img[src*="byteimg.com"]'))
+        
+        // 尝试获取页面上的其他图片
+        const images = Array.from(document.querySelectorAll('img[src*="byteimg.com"], img[src*="ibyteimg.com"]'))
             .filter(img =>
                 img.src &&
                 !img.src.includes('avatar') &&
                 !img.src.includes('emoji') &&
-                !img.src.includes('icon')
+                !img.src.includes('icon') &&
+                img.width > 200 &&
+                img.height > 200
             );
+        
         if (images.length > 0) {
             // 取最大宽高的那张
             images.sort((a, b) => (b.width * b.height) - (a.width * a.height));
-            return images[0].src;
+            const tempElement = document.createElement('div');
+            tempElement.innerHTML = images[0].src;
+            const url = tempElement.textContent || tempElement.innerText || images[0].src;
+            return { processedUrl: url, originalUrl: images[0].src };
         }
+        
         return null;
     }
 
@@ -284,15 +250,380 @@
     function getCurrentImageUrl() {
         const { platform } = checkPageType();
         if (platform === 'doubao') {
-            return getDoubaoImageUrl();
-        } else {
-            // 即梦AI和Dreamina平台通用逻辑
-            const previewImage = document.querySelector('[role="dialog"] img, .preview-image img');
-            if (previewImage && previewImage.src) {
-                return previewImage.src.replace(/resize:\d+:\d+/, 'resize:2048:2048');
-            }
+            // 调用正确的函数名 getDoubaoImageUrls (复数)
+            const urls = getDoubaoImageUrls();
+            // 返回数组中的第一个URL，如果数组不为空
+            return urls.length > 0 ? urls[0] : null;
+        } else if (platform === 'jimeng') {
+            // 即梦AI专用逻辑
+            return { processedUrl: getJimengImageUrl(), originalUrl: getJimengImageUrl() };
+        } else if (platform === 'dreamina') {
+            // Dreamina平台专用逻辑
+            return getDreaminaImageUrl();
         }
         return null;
+    }
+
+    // 添加WebP转JPEG的函数
+    async function webpToJpeg(blob) {
+        return new Promise((resolve, reject) => {
+            try {
+                // 创建一个图片元素来加载WebP
+                const img = new Image();
+                img.onload = function() {
+                    // 创建canvas并绘制图像
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    
+                    // 将canvas转换为JPEG Blob
+                    canvas.toBlob(function(jpegBlob) {
+                        resolve(jpegBlob);
+                    }, 'image/jpeg', 0.95);
+                };
+                img.onerror = function() {
+                    reject(new Error('WebP图像加载失败'));
+                };
+                
+                // 从Blob创建URL并加载图像
+                img.src = URL.createObjectURL(blob);
+            } catch (e) {
+                reject(e);
+            }
+        });
+    }
+
+    // 下载Blob对象
+    function downloadBlob(blob, filename) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    // 处理图片下载（只下载当前点开的那一张）
+    async function handleImageDownload(btn) {
+        try {
+            console.log('开始处理图片下载...');
+            const { platform } = checkPageType();
+            console.log('当前平台:', platform);
+
+            // 获取原始URL
+            let urlObj = getCurrentImageUrl();
+            if (!urlObj) {
+                console.error('获取图片URL失败');
+                throw new Error('未找到可下载的图片');
+            }
+
+            let originalUrl = urlObj.originalUrl || urlObj.processedUrl;
+            let processedUrl = urlObj.processedUrl || originalUrl;
+            
+            console.log('获取到的原始URL:', originalUrl);
+            console.log('处理后的URL:', processedUrl);
+
+            // 1. 处理HTML实体 (&amp; -> &)
+            let urlForProcessing = processedUrl.replace(/&amp;/g, '&');
+            console.log('处理HTML实体后的URL:', urlForProcessing);
+
+            // 2. 准备用于下载的URL (根据平台决定是否解码)
+            let urlForDownload = urlForProcessing; // 默认使用未解码的
+            let decodedUrlForFilename = urlForProcessing; // 用于文件名的URL，优先尝试解码
+
+            if (platform !== 'jimeng') {
+                // 对于非即梦平台，尝试解码URL用于下载
+                try {
+                    urlForDownload = decodeURIComponent(urlForProcessing);
+                    console.log('为非即梦平台解码URL (用于下载):', urlForDownload);
+                    decodedUrlForFilename = urlForDownload; // 文件名也用解码后的
+                } catch (e) {
+                    console.warn(`为平台 ${platform} 解码URL失败，将使用未解码URL进行下载:`, e);
+                    // 如果解码失败，下载和文件名都用未解码的
+                    urlForDownload = urlForProcessing;
+                    decodedUrlForFilename = urlForProcessing;
+                }
+            } else {
+                 // 对于即梦平台，下载时不解码，但尝试解码用于获取文件名
+                 console.log('即梦平台，下载URL保持不解码:', urlForDownload);
+                 try {
+                    decodedUrlForFilename = decodeURIComponent(urlForProcessing);
+                    console.log('为即梦平台尝试解码URL (仅用于提取文件名):', decodedUrlForFilename);
+                 } catch (e) {
+                    console.warn('为即梦平台解码URL以获取文件名失败，将使用未解码URL尝试提取:', e);
+                    decodedUrlForFilename = urlForProcessing; // 解码失败则用未解码的提取文件名
+                 }
+            }
+
+            // 3. 获取文件名 (从尝试解码后的URL中提取)
+            let desc = getImageDescription() || 'AI图片';
+            const extMatch = decodedUrlForFilename.match(/\.(jpg|jpeg|png|gif|webp)(\?|$)/i);
+            const ext = extMatch ? extMatch[1] : 'png';
+            const filename = `${desc}.${ext}`;
+            console.log('生成的文件名:', filename);
+
+            // 4. 设置请求头
+            const headers = {
+                'Referer': window.location.href,
+                'Origin': window.location.origin,
+                'Accept': 'image/webp,image/*,*/*;q=0.8',
+                'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
+                'Cache-Control': 'no-cache',
+                'Pragma': 'no-cache',
+                'User-Agent': navigator.userAgent,
+                'sec-ch-ua': `"Not A(Brand";v="99", "Google Chrome";v="${navigator.userAgent.match(/Chrome\/(\d+)/)?.[1] || '120'}", "Chromium";v="${navigator.userAgent.match(/Chrome\/(\d+)/)?.[1] || '120'}"`,
+                'sec-ch-ua-mobile': '?0',
+                'sec-ch-ua-platform': '"Windows"',
+                'sec-fetch-dest': 'image',
+                'sec-fetch-mode': 'no-cors',
+                'sec-fetch-site': 'cross-site'
+            };
+
+            // 添加平台特定的请求头
+            if (platform === 'jimeng') {
+                headers['Cookie'] = document.cookie;
+                console.log('为即梦平台添加Cookie请求头');
+            } else if (platform === 'doubao') {
+                // 豆包特定请求头
+                headers['Cookie'] = document.cookie;
+                headers['x-requested-with'] = 'XMLHttpRequest';
+                console.log('为豆包平台添加特定请求头');
+            } else if (platform === 'dreamina') {
+                // Dreamina特定请求头
+                headers['Cookie'] = document.cookie;
+                headers['x-requested-with'] = 'XMLHttpRequest';
+                console.log('为Dreamina平台添加特定请求头');
+            }
+
+            console.log('最终请求头:', headers);
+            console.log('最终下载URL:', urlForDownload); // 确认最终用于下载的URL
+
+            // 5. 下载图片 (使用根据平台处理过的 urlForDownload)
+            await new Promise((resolve, reject) => {
+                // 尝试使用fetch API直接下载（对于豆包和Dreamina可能更有效）
+                if ((platform === 'doubao' || platform === 'dreamina') && typeof fetch === 'function') {
+                    console.log('尝试使用fetch API下载图片');
+                    
+                    // 使用fetch API
+                    fetch(urlForDownload, {
+                        method: 'GET',
+                        headers: headers,
+                        credentials: 'include',
+                        mode: 'cors'
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            console.warn(`Fetch下载失败 (${response.status})，尝试备选方案`);
+                            throw new Error(`Fetch下载失败，状态码: ${response.status}`);
+                        }
+                        return response.blob();
+                    })
+                    .then(blob => {
+                        // 处理WebP转换
+                        if (filename.endsWith('.webp')) {
+                            return webpToJpeg(blob).then(jpegBlob => {
+                                const newFilename = filename.replace(/\.webp$/i, '.jpg');
+                                downloadBlob(jpegBlob, newFilename);
+                                console.log('WebP转换成功并下载:', newFilename);
+                                return true;
+                            }).catch(e => {
+                                console.error('WebP转换失败，使用原格式下载', e);
+                                downloadBlob(blob, filename);
+                                return true;
+                            });
+                        } else {
+                            downloadBlob(blob, filename);
+                            console.log('直接下载非WebP格式:', filename);
+                            return true;
+                        }
+                    })
+                    .then(() => {
+                        showSuccess(btn);
+                        resolve();
+                    })
+                    .catch(err => {
+                        console.warn('Fetch API下载失败，尝试GM_xmlhttpRequest:', err);
+                        // 如果fetch失败，回退到GM_xmlhttpRequest
+                        useGMXmlHttpRequest();
+                    });
+                } else {
+                    // 直接使用GM_xmlhttpRequest
+                    useGMXmlHttpRequest();
+                }
+
+                // 使用GM_xmlhttpRequest的函数
+                function useGMXmlHttpRequest() {
+                    GM_xmlhttpRequest({
+                        method: 'GET',
+                        url: urlForDownload,
+                        responseType: 'blob',
+                        headers: headers,
+                        withCredentials: true,
+                        onload: async function(response) {
+                            console.log(`GM_xmlhttpRequest onload - 状态码: ${response.status}`);
+                            if (response.status !== 200) {
+                                // 尝试使用原始URL作为备选
+                                if (originalUrl && originalUrl !== urlForDownload) {
+                                    console.warn(`下载处理后URL失败，尝试使用原始URL: ${originalUrl}`);
+                                    tryOriginalUrl();
+                                    return;
+                                }
+                                
+                                // 失败处理逻辑
+                                handleDownloadFailure(response.status);
+                                return;
+                            }
+
+                            let blob = response.response;
+                            // WebP转换逻辑
+                            if (filename.endsWith('.webp')) {
+                                try {
+                                    console.log('尝试将WebP转换为JPEG');
+                                    blob = await webpToJpeg(blob);
+                                    const newFilename = filename.replace(/\.webp$/i, '.jpg');
+                                    downloadBlob(blob, newFilename);
+                                    console.log('WebP转换成功并下载:', newFilename);
+                                } catch (e) {
+                                    console.error('WebP转换失败，使用原格式下载', e);
+                                    downloadBlob(blob, filename);
+                                }
+                            } else {
+                                downloadBlob(blob, filename);
+                                console.log('直接下载非WebP格式:', filename);
+                            }
+
+                            showSuccess(btn);
+                            resolve();
+                        },
+                        onerror: function(err) {
+                            console.error('GM_xmlhttpRequest发生错误:', err);
+                            
+                            // 尝试使用原始URL作为备选
+                            if (originalUrl && originalUrl !== urlForDownload) {
+                                console.warn(`下载处理后URL失败，尝试使用原始URL: ${originalUrl}`);
+                                tryOriginalUrl();
+                                return;
+                            }
+                            
+                            // 错误处理逻辑
+                            handleDownloadError(err);
+                        }
+                    });
+                }
+                
+                // 尝试使用原始URL下载
+                function tryOriginalUrl() {
+                    console.log('尝试使用原始URL下载:', originalUrl);
+                    GM_xmlhttpRequest({
+                        method: 'GET',
+                        url: originalUrl,
+                        responseType: 'blob',
+                        headers: headers,
+                        withCredentials: true,
+                        onload: async function(response) {
+                            console.log(`使用原始URL - GM_xmlhttpRequest onload - 状态码: ${response.status}`);
+                            if (response.status !== 200) {
+                                // 失败处理逻辑
+                                handleDownloadFailure(response.status);
+                                return;
+                            }
+
+                            let blob = response.response;
+                            // WebP转换逻辑
+                            if (filename.endsWith('.webp')) {
+                                try {
+                                    blob = await webpToJpeg(blob);
+                                    const newFilename = filename.replace(/\.webp$/i, '.jpg');
+                                    downloadBlob(blob, newFilename);
+                                } catch (e) {
+                                    downloadBlob(blob, filename);
+                                }
+                            } else {
+                                downloadBlob(blob, filename);
+                            }
+
+                            showSuccess(btn);
+                            resolve();
+                        },
+                        onerror: function(err) {
+                            // 错误处理逻辑
+                            handleDownloadError(err);
+                        }
+                    });
+                }
+                
+                // 处理下载失败
+                function handleDownloadFailure(status) {
+                    if (platform === 'jimeng') {
+                        console.warn(`GM_xmlhttpRequest下载失败 (${status})，尝试直接打开图片让用户手动保存`);
+                        alert('自动下载失败，即将打开图片，请在图片上右键选择"图片另存为"进行保存');
+                        window.open(urlForDownload, '_blank');
+                        showError(btn, new Error(`下载失败，状态码: ${status}，已尝试打开图片。`));
+                        reject(new Error(`下载失败，状态码: ${status}`));
+                    } else if (platform === 'doubao' || platform === 'dreamina') {
+                        console.warn(`${platform}平台下载失败 (${status})，尝试直接打开图片让用户手动保存`);
+                        alert('自动下载失败，即将打开图片，请在图片上右键选择"图片另存为"进行保存');
+                        window.open(originalUrl || urlForDownload, '_blank');
+                        showError(btn, new Error(`下载失败，状态码: ${status}，已尝试打开图片。`));
+                        reject(new Error(`下载失败，状态码: ${status}`));
+                    } else {
+                        console.error(`平台 ${platform} 下载失败，状态码: ${status}`);
+                        showError(btn, new Error(`下载失败，状态码: ${status}`));
+                        reject(new Error(`下载失败，状态码: ${status}`));
+                    }
+                }
+                
+                // 处理下载错误
+                function handleDownloadError(err) {
+                    if (platform === 'jimeng') {
+                        console.error('GM_xmlhttpRequest发生错误，尝试直接打开图片让用户手动保存:', err);
+                        alert('自动下载失败，即将打开图片，请在图片上右键选择"图片另存为"进行保存');
+                        window.open(urlForDownload, '_blank');
+                        showError(btn, new Error('下载请求错误，已尝试打开图片。'));
+                        reject(err);
+                    } else if (platform === 'doubao' || platform === 'dreamina') {
+                        console.error(`${platform}平台下载请求错误，尝试直接打开图片:`, err);
+                        alert('自动下载失败，即将打开图片，请在图片上右键选择"图片另存为"进行保存');
+                        window.open(originalUrl || urlForDownload, '_blank');
+                        showError(btn, new Error('下载请求错误，已尝试打开图片。'));
+                        reject(err);
+                    } else {
+                        console.error(`平台 ${platform} 下载请求错误:`, err);
+                        showError(btn, new Error('下载请求错误'));
+                        reject(err);
+                    }
+                }
+            });
+        } catch (e) {
+            console.error('handleImageDownload函数捕获到错误:', e);
+            // 异常处理逻辑
+            const { platform } = checkPageType(); // 重新获取以防万一
+            if ((platform === 'jimeng' || platform === 'doubao' || platform === 'dreamina') && e.message !== '未找到可下载的图片') {
+                 console.error(`${platform}平台下载过程中发生未知错误，尝试直接打开图片:`, e);
+                 alert('自动下载失败，即将打开图片，请在图片上右键选择"图片另存为"进行保存');
+                 let urlObj = getCurrentImageUrl();
+                 if (urlObj) {
+                     let urlToOpen = urlObj.originalUrl || urlObj.processedUrl;
+                     if (urlToOpen) {
+                         urlToOpen = urlToOpen.replace(/&amp;/g, '&');
+                         window.open(urlToOpen, '_blank');
+                     }
+                 }
+                 showError(btn, e);
+            } else if (e.message !== '未找到可下载的图片') {
+                 // 其他平台或找不到图片错误
+                 console.error(`平台 ${platform} 下载过程中发生未知错误:`, e);
+                 showError(btn, e);
+            } else {
+                 // 未找到图片错误
+                 showError(btn, e);
+                 console.error('下载失败', e);
+            }
+        }
     }
 
     // 获取视频URL
@@ -332,60 +663,55 @@
         return null;
     }
 
-    // 处理图片下载（只下载当前点开的那一张）
-    async function handleImageDownload(btn) {
-        try {
-            console.log('开始处理图片下载...');
-            const { platform } = checkPageType();
-            console.log('当前平台:', platform);
-            const originalUrl = getCurrentImageUrl();
-            if (!originalUrl) {
-                console.error('获取图片URL失败');
-                throw new Error('未找到可下载的图片');
-            }
-            console.log('开始下载图片:', originalUrl);
-            let desc = getImageDescription() || 'AI图片';
-            const ext = originalUrl.match(/\.(jpg|jpeg|png|gif|webp)/i);
-            const filename = desc + (ext ? ext[0] : '.png');
-            await new Promise((resolve, reject) => {
-                GM_xmlhttpRequest({
-                    method: 'GET',
-                    url: originalUrl,
-                    responseType: 'blob',
-                    headers: {
-                        'Referer': window.location.href,
-                        'Origin': window.location.origin,
-                        'Accept': 'image/webp,image/*,*/*;q=0.8',
-                        'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
-                        'Cache-Control': 'no-cache',
-                        'Pragma': 'no-cache',
-                        'User-Agent': navigator.userAgent,
-                        'Access-Control-Allow-Origin': '*',
-                        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS'
-                    },
-                    onload: function(response) {
-                        const blob = response.response;
-                        const url = URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = filename;
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                        setTimeout(() => URL.revokeObjectURL(url), 1000);
-                        showSuccess(btn); // 新增：下载成功后恢复按钮
-                        resolve();
-                    },
-                    onerror: function(err) {
-                        showError(btn, err); // 新增：下载失败后恢复按钮
-                        reject(err);
+    // 获取图片描述词 (确保能正确处理)
+    function getImageDescription() {
+        const { platform } = checkPageType();
+        let descElement = null;
+        let text = '';
+        let match = null;
+
+        if (platform === 'doubao') {
+            const messageElements = document.querySelectorAll('.message-content');
+            for (const element of messageElements) {
+                if (element.textContent.includes('/imagine')) {
+                    const text = element.textContent.trim();
+                    const match = text.match(/\/imagine\s+(.+)/);
+                    if (match) {
+                        return match[1].trim()
+                            .replace(/[<>:"\/\\|?*]/g, '')
+                            .replace(/\s+/g, '_')
+                            .slice(0, 100);
                     }
-                });
-            });
-        } catch (e) {
-            showError(btn, e); // 新增：异常时恢复按钮
-            console.error('下载失败', e);
+                }
+            }
+            return '';
+        } else if (platform === 'dreamina') {
+            // Dreamina平台的描述词提取
+            const descElement = document.querySelector('.image-description, .prompt-text, [class*="description"], [class*="prompt"]');
+            if (descElement) {
+                const text = descElement.textContent.trim();
+                const match = text.match(/(描述|影像提示|Prompt)[:：\s]*(.+)/i);
+                if (match) {
+                    text = match[1].trim();
+                }
+                // 如果没有匹配到特定前缀，直接使用全部文本
+                return text.replace(/[<>:"\/\\|?*]/g, '') // 移除非法字符
+                           .replace(/\s+/g, '_') // 空格替换为下划线
+                           .slice(0, 150); // 限制长度
+            }
         }
+        // 备选：尝试从aria-label或alt属性获取
+        const imgElement = document.querySelector('.imageWrapper-Lc22P_ img, [role="dialog"] img, .preview-image img, .image-preview img, .image-origin > img');
+        if(imgElement) {
+            text = imgElement.getAttribute('aria-label') || imgElement.alt || '';
+            if (text) {
+                 return text.replace(/[<>:"\/\\|?*]/g, '')
+                           .replace(/\s+/g, '_')
+                           .slice(0, 150);
+            }
+        }
+
+        return ''; // 默认返回空字符串
     }
 
     // 处理视频下载
