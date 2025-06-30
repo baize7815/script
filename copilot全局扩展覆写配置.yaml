@@ -1,0 +1,18 @@
+# =======================================================
+# == 全局自定义规则 (Global Custom Rules)
+# == 这些规则会自动合并到你所有的订阅配置中
+# == Created for GitHub Copilot
+# =======================================================
+rules:
+  # --- GitHub & Copilot 规则 ---
+  # DOMAIN-KEYWORD,github,PROXY  # 这是一个更宽泛的规则，可以作为备用
+  - DOMAIN-SUFFIX,github.com,PROXY
+  - DOMAIN-SUFFIX,github.dev,PROXY
+  - DOMAIN-SUFFIX,github.io,PROXY
+  - DOMAIN-SUFFIX,githubassets.com,PROXY
+  - DOMAIN-SUFFIX,githubusercontent.com,PROXY
+  - DOMAIN,copilot-proxy.githubusercontent.com,PROXY
+
+  # --- 登录验证相关 (建议保留) ---
+  - DOMAIN-SUFFIX,microsoftonline.com,PROXY
+  - DOMAIN-SUFFIX,live.com,PROXY
