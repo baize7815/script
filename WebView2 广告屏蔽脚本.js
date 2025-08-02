@@ -1,81 +1,128 @@
-// 广告屏蔽脚本 - 在网页加载后自动执行
+// 广告屏蔽脚本 - 更精准的版本
 (function() {
-    // 通用广告选择器
+    // 更精确的广告选择器，减少误伤
     const adSelectors = [
-        // 常见广告容器
-        '[class*="ad-"]', '[class*="ads-"]', '[class*="advertisement"]', 
-        '[id*="ad-"]', '[id*="ads-"]', '[id*="advertisement"]',
-        // 弹窗相关
-        '.popup', '.modal-ad', '.overlay-ad', '[class*="popup"]', 
-        // 常见广告框架
+        // 明确的广告标识
+        '[class*="ad-"][class*="banner"]', '[class*="ad-"][class*="popup"]', 
+        '[id*="ad-"][id*="banner"]', '[id*="ad-"][id*="popup"]',
+        // 特定广告服务
+        '.adsbygoogle', '#ad-container', '.ad-container:not(.content):not(.main)',
+        // 弹窗和遮罩广告 - 更精确的匹配
+        '.popup-ad', '.modal-ad', '.overlay-ad', '[class*="popup-ad"]', 
+        // 广告框架 - 只匹配明确的广告来源
         'iframe[src*="googleadservices"]', 'iframe[src*="doubleclick"]', 
-        'iframe[src*="ad."]', 'iframe[src*="ads."]', 'iframe[src*="advert"]',
-        // 广告图片和横幅
-        'img[src*="ad."]', 'img[src*="ads."]', 'img[src*="advert"]',
-        'div[class*="banner"]', '[id*="banner"]',
-        // 特定广告容器
-        '.adsbygoogle', '#ad-container', '.ad-container', '.ad-wrapper',
-        // 弹出层和遮罩
-        '.modal', '.overlay', '.mask', '[class*="mask"]'
+        'iframe[src*="ad."][src*="banner"]', 'iframe[src*="ads."][src*="banner"]', 
+        // 广告图片 - 更明确的匹配
+        'img[src*="ad."][src*="banner"]', 'img[src*="ads."][src*="banner"]',
+        // 明确的广告标识
+        '[class*="advertisement"]', '[id*="advertisement"]'
     ];
     
-    // 移除广告元素的函数
+    // 白名单选择器 - 这些元素不会被屏蔽
+    const safeSelectors = [
+        '.content', '.main', '.article', '.post', 
+        '.navigation', '.menu', '.header', '.footer',
+        '#content', '#main', '#navigation', '#menu'
+    ];
+    
+    /**
+     * 检查元素是否在白名单中
+     * @param {Element} element - 要检查的元素
+     * @returns {boolean} - 如果元素在白名单中返回true
+     */
+    function isInSafeList(element) {
+        // 检查元素自身及其父元素是否匹配白名单
+        let current = element;
+        while (current && current !== document.body) {
+            for (const selector of safeSelectors) {
+                if (current.matches && current.matches(selector)) {
+                    return true;
+                }
+                
+                // 检查class和id中是否包含白名单关键词
+                const classNames = current.className.split(' ');
+                for (const className of classNames) {
+                    if (className && safeSelectors.some(s => s.replace('.', '') === className)) {
+                        return true;
+                    }
+                }
+                
+                if (current.id && safeSelectors.some(s => s.replace('#', '') === current.id)) {
+                    return true;
+                }
+            }
+            current = current.parentElement;
+        }
+        return false;
+    }
+    
+    /**
+     * 更智能地移除广告元素
+     */
     function removeAds() {
         // 合并所有选择器并查找匹配的元素
         const adElements = document.querySelectorAll(adSelectors.join(','));
         
-        // 移除找到的广告元素
+        // 移除找到的广告元素，但先检查是否在白名单中
         adElements.forEach(element => {
-            if(element && element.parentNode) {
+            if(element && element.parentNode && !isInSafeList(element)) {
                 console.log('移除广告元素:', element);
                 element.parentNode.removeChild(element);
             }
         });
         
-        // 移除可能的固定定位元素（常见于弹窗广告）
+        // 更智能地移除固定定位元素
         const fixedElements = document.querySelectorAll('div[style*="position: fixed"]');
         fixedElements.forEach(element => {
-            // 检查是否可能是广告（简单启发式判断）
-            if(element.innerHTML.toLowerCase().includes('ad') || 
-               element.innerHTML.toLowerCase().includes('广告') ||
-               element.style.zIndex > 1000) {
+            // 只有在确认是广告时才移除
+            if(!isInSafeList(element) && 
+               (element.innerHTML.toLowerCase().includes('advertisement') || 
+                element.innerHTML.toLowerCase().includes('advertisement') ||
+                element.innerHTML.toLowerCase().includes('广告') ||
+                element.innerHTML.toLowerCase().includes('赞助'))) {
                 console.log('移除固定定位广告元素:', element);
                 element.parentNode.removeChild(element);
             }
         });
         
-        // 移除body上的可能阻止滚动的样式（常见于全屏弹窗）
-        if(document.body.style.overflow === 'hidden') {
+        // 更智能地处理body的overflow属性
+        const visibleElements = document.querySelectorAll('body > *:not(script):not(style):not(noscript)');
+        if(document.body.style.overflow === 'hidden' && visibleElements.length > 1) {
             document.body.style.overflow = 'auto';
         }
     }
     
-    // 阻止广告脚本加载
+    /**
+     * 更智能地阻止广告脚本加载
+     */
     function blockAdScripts() {
         // 创建一个新的空白函数来替换原始的广告函数
         const emptyFunc = function() { return true; };
         
-        // 常见的广告相关对象和函数
+        // 更精确的广告相关对象列表
         const adObjects = [
-            'googletag', 'googlefc', 'googleAdSlots', 'adsbygoogle',
+            'googletag', 'googlefc', 'googleAdSlots', 
             'amzn_assoc', 'criteo', 'taboola', 'outbrain'
         ];
         
         // 替换广告对象
         adObjects.forEach(obj => {
-            if(window[obj]) {
+            if(window[obj] && typeof window[obj] !== 'function') {
                 console.log('屏蔽广告对象:', obj);
                 window[obj] = emptyFunc;
             }
         });
         
-        // 阻止新的广告脚本加载
+        // 更智能地阻止脚本加载
         const originalAppendChild = Element.prototype.appendChild;
         Element.prototype.appendChild = function(element) {
             if(element.tagName === 'SCRIPT') {
                 const src = element.src || '';
-                if(src.includes('ads') || src.includes('ad.') || 
-                   src.includes('analytics') || src.includes('tracker')) {
+                // 只阻止明确的广告脚本
+                if(src.includes('doubleclick') || 
+                   src.includes('googleadservices') ||
+                   src.includes('adserver') ||
+                   (src.includes('ad.') && src.includes('banner'))) {
                     console.log('阻止广告脚本加载:', src);
                     return document.createComment('已屏蔽的广告脚本: ' + src);
                 }
@@ -84,25 +131,23 @@
         };
     }
     
-    // 创建自定义样式来隐藏广告
+    /**
+     * 创建自定义样式来隐藏广告
+     */
     function addAdBlockStyles() {
         const style = document.createElement('style');
         style.textContent = `
+            /* 只隐藏明确的广告元素，而不是全部隐藏 */
             ${adSelectors.join(', ')} {
                 display: none !important;
-                visibility: hidden !important;
-                opacity: 0 !important;
-                pointer-events: none !important;
-                height: 0 !important;
-                min-height: 0 !important;
-                max-height: 0 !important;
-                overflow: hidden !important;
             }
         `;
         document.head.appendChild(style);
     }
     
-    // 初始执行
+    /**
+     * 初始化函数
+     */
     function init() {
         console.log('广告屏蔽脚本已启动');
         
@@ -116,7 +161,7 @@
         removeAds();
         
         // 设置定时器定期检查和移除新出现的广告
-        setInterval(removeAds, 1000);
+        setInterval(removeAds, 2000);  // 增加间隔，减少性能影响
         
         // 监听DOM变化，处理动态加载的广告
         const observer = new MutationObserver(mutations => {
@@ -124,7 +169,18 @@
             
             mutations.forEach(mutation => {
                 if(mutation.addedNodes.length > 0) {
-                    shouldRemoveAds = true;
+                    // 检查新添加的节点是否可能是广告
+                    for(const node of mutation.addedNodes) {
+                        if(node.nodeType === 1) {  // 元素节点
+                            // 检查是否匹配广告选择器且不在白名单中
+                            for(const selector of adSelectors) {
+                                if(node.matches && node.matches(selector) && !isInSafeList(node)) {
+                                    shouldRemoveAds = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
                 }
             });
             
