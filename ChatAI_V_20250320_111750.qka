@@ -1,0 +1,4178 @@
+{
+  "LimitSingleInstance": false,
+  "SummaryExpression": "$$",
+  "SubPrograms": [
+    {
+      "Id": "d04e80cc-2b11-4ad5-b954-4bab490d9e99",
+      "Icon": null,
+      "Name": "image_hosting",
+      "Description": "",
+      "SummaryExpression": "$$",
+      "CreateTimeUtc": "2025-01-14T03:24:14.1788994Z",
+      "LastEditTimeUtc": "2025-03-17T05:48:29.5947833Z",
+      "IsLocalEdited": true,
+      "Variables": [
+        {
+          "Key": "img_url",
+          "Type": 0,
+          "Desc": "",
+          "DefaultValue": "",
+          "SaveState": false,
+          "IsInput": false,
+          "IsOutput": true,
+          "ParamName": "",
+          "InputParamInfo": null,
+          "OutputParamInfo": null,
+          "TableDef": null,
+          "CustomType": null,
+          "Group": null
+        },
+        {
+          "Key": "isSuccess",
+          "Type": 2,
+          "Desc": "",
+          "DefaultValue": "",
+          "SaveState": false,
+          "IsInput": false,
+          "IsOutput": false,
+          "ParamName": "",
+          "InputParamInfo": null,
+          "OutputParamInfo": null,
+          "TableDef": null,
+          "CustomType": null,
+          "Group": null
+        },
+        {
+          "Key": "response",
+          "Type": 10,
+          "Desc": "",
+          "DefaultValue": "",
+          "SaveState": false,
+          "IsInput": false,
+          "IsOutput": false,
+          "ParamName": "",
+          "InputParamInfo": null,
+          "OutputParamInfo": null,
+          "TableDef": null,
+          "CustomType": null,
+          "Group": ""
+        },
+        {
+          "Key": "img_hosting_key",
+          "Type": 0,
+          "Desc": "",
+          "DefaultValue": "",
+          "SaveState": false,
+          "IsInput": false,
+          "IsOutput": false,
+          "ParamName": "",
+          "InputParamInfo": null,
+          "OutputParamInfo": null,
+          "TableDef": null,
+          "CustomType": null,
+          "Group": ""
+        },
+        {
+          "Key": "fullpath",
+          "Type": 0,
+          "Desc": "",
+          "DefaultValue": "",
+          "SaveState": false,
+          "IsInput": false,
+          "IsOutput": false,
+          "ParamName": "",
+          "InputParamInfo": null,
+          "OutputParamInfo": null,
+          "TableDef": null,
+          "CustomType": null,
+          "Group": ""
+        },
+        {
+          "Key": "image",
+          "Type": 3,
+          "Desc": "",
+          "DefaultValue": "",
+          "SaveState": false,
+          "IsInput": true,
+          "IsOutput": false,
+          "ParamName": "",
+          "InputParamInfo": null,
+          "OutputParamInfo": null,
+          "TableDef": null,
+          "CustomType": null,
+          "Group": null
+        },
+        {
+          "Key": "files",
+          "Type": 4,
+          "Desc": "",
+          "DefaultValue": "",
+          "SaveState": false,
+          "IsInput": false,
+          "IsOutput": false,
+          "ParamName": "",
+          "InputParamInfo": null,
+          "OutputParamInfo": null,
+          "TableDef": null,
+          "CustomType": null,
+          "Group": null
+        }
+      ],
+      "Steps": [
+        {
+          "StepRunnerKey": "sys:assign",
+          "InputParams": {
+            "input": {
+              "VarKey": null,
+              "Value": "$=Path.GetTempPath() + DateTime.Now.ToString(\"yyyy-MM-dd_HH-mm-ss\") + \".png\""
+            },
+            "stopIfFail": {
+              "VarKey": null,
+              "Value": "1"
+            }
+          },
+          "OutputParams": {
+            "isSuccess": null,
+            "output": "files",
+            "errMessage": null
+          },
+          "IfSteps": null,
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": false,
+          "DelayMs": 0
+        },
+        {
+          "StepRunnerKey": "sys:WriteImageFile",
+          "InputParams": {
+            "content": {
+              "VarKey": "image",
+              "Value": null
+            },
+            "filePath": {
+              "VarKey": null,
+              "Value": "$={files}[0]"
+            },
+            "quality": {
+              "VarKey": null,
+              "Value": "95"
+            },
+            "stopIfFail": {
+              "VarKey": null,
+              "Value": "1"
+            }
+          },
+          "OutputParams": {
+            "isSuccess": null,
+            "errMessage": null
+          },
+          "IfSteps": null,
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": false,
+          "DelayMs": 0
+        },
+        {
+          "StepRunnerKey": "sys:joinList",
+          "InputParams": {
+            "list": {
+              "VarKey": "files",
+              "Value": null
+            },
+            "separator": {
+              "VarKey": null,
+              "Value": ""
+            },
+            "escapeSeparator": {
+              "VarKey": null,
+              "Value": "0"
+            }
+          },
+          "OutputParams": {
+            "output": "fullpath"
+          },
+          "IfSteps": null,
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": false,
+          "DelayMs": 0
+        },
+        {
+          "StepRunnerKey": "sys:assign",
+          "InputParams": {
+            "input": {
+              "VarKey": null,
+              "Value": "chv_BFKc_688b4d966a89f0097724533603176a6c45e0699751cad548aa306e84c3c35ba4078f92a0b576acd3fcaadbeec69e474b58e5b5fdc10e6ec64cbd08b753e0f9f2"
+            },
+            "stopIfFail": {
+              "VarKey": null,
+              "Value": "1"
+            }
+          },
+          "OutputParams": {
+            "isSuccess": null,
+            "output": "img_hosting_key",
+            "errMessage": null
+          },
+          "IfSteps": null,
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": false,
+          "DelayMs": 0
+        },
+        {
+          "StepRunnerKey": "sys:http",
+          "InputParams": {
+            "url": {
+              "VarKey": null,
+              "Value": "https://www.picgo.net/api/1/upload"
+            },
+            "method": {
+              "VarKey": null,
+              "Value": "POST"
+            },
+            "header": {
+              "VarKey": null,
+              "Value": "$$X-API-Key:{img_hosting_key}"
+            },
+            "cookie": {
+              "VarKey": null,
+              "Value": ""
+            },
+            "bodyType": {
+              "VarKey": null,
+              "Value": "FILE"
+            },
+            "body": {
+              "VarKey": null,
+              "Value": "$$source=FILE:{fullpath}"
+            },
+            "contentType": {
+              "VarKey": null,
+              "Value": ""
+            },
+            "resultType": {
+              "VarKey": null,
+              "Value": "Text"
+            },
+            "ua": {
+              "VarKey": null,
+              "Value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36"
+            },
+            "expireSeconds": {
+              "VarKey": null,
+              "Value": "100"
+            },
+            "noAutoRedirect": {
+              "VarKey": null,
+              "Value": "0"
+            },
+            "showProgress": {
+              "VarKey": null,
+              "Value": "0"
+            },
+            "skipCertVerify": {
+              "VarKey": null,
+              "Value": "0"
+            },
+            "forceProxy": {
+              "VarKey": null,
+              "Value": "0"
+            },
+            "stopIfFail": {
+              "VarKey": null,
+              "Value": "1"
+            },
+            "useSSE": {
+              "VarKey": null,
+              "Value": "0"
+            },
+            "sseSpName": {
+              "VarKey": null,
+              "Value": ""
+            }
+          },
+          "OutputParams": {
+            "isSuccess": "isSuccess",
+            "statusCode": null,
+            "respHeaders": null,
+            "respCookies": null,
+            "content": "response",
+            "imgResult": null,
+            "errMessage": null
+          },
+          "IfSteps": null,
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": false,
+          "DelayMs": 0
+        },
+        {
+          "StepRunnerKey": "sys:jsonExtract",
+          "InputParams": {
+            "data": {
+              "VarKey": "response",
+              "Value": null
+            },
+            "p0": {
+              "VarKey": null,
+              "Value": "image.url"
+            },
+            "p1": {
+              "VarKey": null,
+              "Value": ""
+            },
+            "p2": {
+              "VarKey": null,
+              "Value": ""
+            },
+            "p3": {
+              "VarKey": null,
+              "Value": ""
+            },
+            "p4": {
+              "VarKey": null,
+              "Value": ""
+            },
+            "dateAsString": {
+              "VarKey": null,
+              "Value": "0"
+            },
+            "stopIfFail": {
+              "VarKey": null,
+              "Value": "1"
+            }
+          },
+          "OutputParams": {
+            "isSuccess": null,
+            "v0": "img_url",
+            "v1": null,
+            "v2": null,
+            "v3": null,
+            "v4": null,
+            "rootToken": null,
+            "errMessage": null
+          },
+          "IfSteps": null,
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": false,
+          "DelayMs": 0
+        }
+      ],
+      "SubPrograms": null,
+      "TemplateId": null,
+      "TemplateRevision": 0,
+      "UseServerVersion": null,
+      "IsProtected": null,
+      "SharedId": null,
+      "ShareTimeUtc": null
+    },
+    {
+      "Id": "b8563403-f152-4b2a-a3fe-6e718a697c92",
+      "Icon": null,
+      "Name": "赋值",
+      "Description": "",
+      "SummaryExpression": "$$",
+      "CreateTimeUtc": "2025-03-18T01:19:56.0106746Z",
+      "LastEditTimeUtc": "2025-03-20T02:28:57.3088033Z",
+      "IsLocalEdited": true,
+      "Variables": [
+        {
+          "Key": "模式",
+          "Type": 0,
+          "Desc": "",
+          "DefaultValue": "下载模式",
+          "SaveState": false,
+          "IsInput": true,
+          "IsOutput": false,
+          "ParamName": "",
+          "InputParamInfo": null,
+          "OutputParamInfo": null,
+          "TableDef": null,
+          "CustomType": null,
+          "Group": ""
+        },
+        {
+          "Key": "url",
+          "Type": 0,
+          "Desc": "",
+          "DefaultValue": "",
+          "SaveState": false,
+          "IsInput": false,
+          "IsOutput": true,
+          "ParamName": "",
+          "InputParamInfo": null,
+          "OutputParamInfo": null,
+          "TableDef": null,
+          "CustomType": null,
+          "Group": "setting"
+        },
+        {
+          "Key": "url_size",
+          "Type": 0,
+          "Desc": "",
+          "DefaultValue": "",
+          "SaveState": false,
+          "IsInput": false,
+          "IsOutput": true,
+          "ParamName": "",
+          "InputParamInfo": null,
+          "OutputParamInfo": null,
+          "TableDef": null,
+          "CustomType": null,
+          "Group": "setting"
+        }
+      ],
+      "Steps": [
+        {
+          "StepRunnerKey": "sys:simpleIf",
+          "InputParams": {
+            "condition": {
+              "VarKey": null,
+              "Value": "$= String.Equals({模式}, \"deepseek\")"
+            }
+          },
+          "OutputParams": {},
+          "IfSteps": [
+            {
+              "StepRunnerKey": "sys:assign",
+              "InputParams": {
+                "input": {
+                  "VarKey": null,
+                  "Value": "https://www.wenxiaobai.com/chat/"
+                },
+                "stopIfFail": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {
+                "isSuccess": null,
+                "output": "url",
+                "errMessage": null
+              },
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            },
+            {
+              "StepRunnerKey": "sys:assign",
+              "InputParams": {
+                "input": {
+                  "VarKey": null,
+                  "Value": "25%,75%"
+                },
+                "stopIfFail": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {
+                "isSuccess": null,
+                "output": "url_size",
+                "errMessage": null
+              },
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            }
+          ],
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": true,
+          "DelayMs": 0
+        },
+        {
+          "StepRunnerKey": "sys:simpleIf",
+          "InputParams": {
+            "condition": {
+              "VarKey": null,
+              "Value": "$= String.Equals({模式}, \"Monica\")"
+            }
+          },
+          "OutputParams": {},
+          "IfSteps": [
+            {
+              "StepRunnerKey": "sys:assign",
+              "InputParams": {
+                "input": {
+                  "VarKey": null,
+                  "Value": "https://monica.cn/home/chat/Monica"
+                },
+                "stopIfFail": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {
+                "isSuccess": null,
+                "output": "url",
+                "errMessage": null
+              },
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            },
+            {
+              "StepRunnerKey": "sys:assign",
+              "InputParams": {
+                "input": {
+                  "VarKey": null,
+                  "Value": "25%,75%"
+                },
+                "stopIfFail": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {
+                "isSuccess": null,
+                "output": "url_size",
+                "errMessage": null
+              },
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            }
+          ],
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": true,
+          "DelayMs": 0
+        },
+        {
+          "StepRunnerKey": "sys:simpleIf",
+          "InputParams": {
+            "condition": {
+              "VarKey": null,
+              "Value": "$= String.Equals({模式}, \"claude\")"
+            }
+          },
+          "OutputParams": {},
+          "IfSteps": [
+            {
+              "StepRunnerKey": "sys:assign",
+              "InputParams": {
+                "input": {
+                  "VarKey": null,
+                  "Value": "https://chat100.ai/zh-CN/app"
+                },
+                "stopIfFail": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {
+                "isSuccess": null,
+                "output": "url",
+                "errMessage": null
+              },
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            },
+            {
+              "StepRunnerKey": "sys:assign",
+              "InputParams": {
+                "input": {
+                  "VarKey": null,
+                  "Value": "25%,75%"
+                },
+                "stopIfFail": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {
+                "isSuccess": null,
+                "output": "url_size",
+                "errMessage": null
+              },
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            }
+          ],
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": true,
+          "DelayMs": 0
+        },
+        {
+          "StepRunnerKey": "sys:simpleIf",
+          "InputParams": {
+            "condition": {
+              "VarKey": null,
+              "Value": "$= String.Equals({模式}, \"gemini\")"
+            }
+          },
+          "OutputParams": {},
+          "IfSteps": [
+            {
+              "StepRunnerKey": "sys:assign",
+              "InputParams": {
+                "input": {
+                  "VarKey": null,
+                  "Value": "https://gemini.google.com/app"
+                },
+                "stopIfFail": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {
+                "isSuccess": null,
+                "output": "url",
+                "errMessage": null
+              },
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            },
+            {
+              "StepRunnerKey": "sys:assign",
+              "InputParams": {
+                "input": {
+                  "VarKey": null,
+                  "Value": "25%,75%"
+                },
+                "stopIfFail": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {
+                "isSuccess": null,
+                "output": "url_size",
+                "errMessage": null
+              },
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            }
+          ],
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": true,
+          "DelayMs": 0
+        },
+        {
+          "StepRunnerKey": "sys:simpleIf",
+          "InputParams": {
+            "condition": {
+              "VarKey": null,
+              "Value": "$= String.Equals({模式}, \"通义千问\")"
+            }
+          },
+          "OutputParams": {},
+          "IfSteps": [
+            {
+              "StepRunnerKey": "sys:assign",
+              "InputParams": {
+                "input": {
+                  "VarKey": null,
+                  "Value": "https://chat.qwenlm.ai/"
+                },
+                "stopIfFail": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {
+                "isSuccess": null,
+                "output": "url",
+                "errMessage": null
+              },
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            },
+            {
+              "StepRunnerKey": "sys:assign",
+              "InputParams": {
+                "input": {
+                  "VarKey": null,
+                  "Value": "25%,75%"
+                },
+                "stopIfFail": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {
+                "isSuccess": null,
+                "output": "url_size",
+                "errMessage": null
+              },
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            }
+          ],
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": true,
+          "DelayMs": 0
+        },
+        {
+          "StepRunnerKey": "sys:simpleIf",
+          "InputParams": {
+            "condition": {
+              "VarKey": null,
+              "Value": "$= String.Equals({模式}, \"blackbox\")"
+            }
+          },
+          "OutputParams": {},
+          "IfSteps": [
+            {
+              "StepRunnerKey": "sys:assign",
+              "InputParams": {
+                "input": {
+                  "VarKey": null,
+                  "Value": "https://www.blackbox.ai"
+                },
+                "stopIfFail": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {
+                "isSuccess": null,
+                "output": "url",
+                "errMessage": null
+              },
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            },
+            {
+              "StepRunnerKey": "sys:assign",
+              "InputParams": {
+                "input": {
+                  "VarKey": null,
+                  "Value": "25%,75%"
+                },
+                "stopIfFail": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {
+                "isSuccess": null,
+                "output": "url_size",
+                "errMessage": null
+              },
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            }
+          ],
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": true,
+          "DelayMs": 0
+        },
+        {
+          "StepRunnerKey": "sys:simpleIf",
+          "InputParams": {
+            "condition": {
+              "VarKey": null,
+              "Value": "$= String.Equals({模式}, \"grok\")"
+            }
+          },
+          "OutputParams": {},
+          "IfSteps": [
+            {
+              "StepRunnerKey": "sys:assign",
+              "InputParams": {
+                "input": {
+                  "VarKey": null,
+                  "Value": "https://grok.com/"
+                },
+                "stopIfFail": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {
+                "isSuccess": null,
+                "output": "url",
+                "errMessage": null
+              },
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            },
+            {
+              "StepRunnerKey": "sys:assign",
+              "InputParams": {
+                "input": {
+                  "VarKey": null,
+                  "Value": "25%,75%"
+                },
+                "stopIfFail": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {
+                "isSuccess": null,
+                "output": "url_size",
+                "errMessage": null
+              },
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            }
+          ],
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": true,
+          "DelayMs": 0
+        },
+        {
+          "StepRunnerKey": "sys:simpleIf",
+          "InputParams": {
+            "condition": {
+              "VarKey": null,
+              "Value": "$= String.Equals({模式}, \"智谱清言\")"
+            }
+          },
+          "OutputParams": {},
+          "IfSteps": [
+            {
+              "StepRunnerKey": "sys:assign",
+              "InputParams": {
+                "input": {
+                  "VarKey": null,
+                  "Value": "https://chatglm.cn/"
+                },
+                "stopIfFail": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {
+                "isSuccess": null,
+                "output": "url",
+                "errMessage": null
+              },
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            },
+            {
+              "StepRunnerKey": "sys:assign",
+              "InputParams": {
+                "input": {
+                  "VarKey": null,
+                  "Value": "65%,75%"
+                },
+                "stopIfFail": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {
+                "isSuccess": null,
+                "output": "url_size",
+                "errMessage": null
+              },
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            }
+          ],
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": true,
+          "DelayMs": 0
+        },
+        {
+          "StepRunnerKey": "sys:simpleIf",
+          "InputParams": {
+            "condition": {
+              "VarKey": null,
+              "Value": "$= String.Equals({模式}, \"Kimi\")"
+            }
+          },
+          "OutputParams": {},
+          "IfSteps": [
+            {
+              "StepRunnerKey": "sys:assign",
+              "InputParams": {
+                "input": {
+                  "VarKey": null,
+                  "Value": "https://kimi.moonshot.cn/"
+                },
+                "stopIfFail": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {
+                "isSuccess": null,
+                "output": "url",
+                "errMessage": null
+              },
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            },
+            {
+              "StepRunnerKey": "sys:assign",
+              "InputParams": {
+                "input": {
+                  "VarKey": null,
+                  "Value": "32%,70%"
+                },
+                "stopIfFail": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {
+                "isSuccess": null,
+                "output": "url_size",
+                "errMessage": null
+              },
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            }
+          ],
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": true,
+          "DelayMs": 0
+        },
+        {
+          "StepRunnerKey": "sys:simpleIf",
+          "InputParams": {
+            "condition": {
+              "VarKey": null,
+              "Value": "$= String.Equals({模式}, \"bolt\")"
+            }
+          },
+          "OutputParams": {},
+          "IfSteps": [
+            {
+              "StepRunnerKey": "sys:assign",
+              "InputParams": {
+                "input": {
+                  "VarKey": null,
+                  "Value": "https://bolt.new/"
+                },
+                "stopIfFail": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {
+                "isSuccess": null,
+                "output": "url",
+                "errMessage": null
+              },
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            },
+            {
+              "StepRunnerKey": "sys:assign",
+              "InputParams": {
+                "input": {
+                  "VarKey": null,
+                  "Value": "30%,75%"
+                },
+                "stopIfFail": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {
+                "isSuccess": null,
+                "output": "url_size",
+                "errMessage": null
+              },
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            }
+          ],
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": true,
+          "DelayMs": 0
+        },
+        {
+          "StepRunnerKey": "sys:simpleIf",
+          "InputParams": {
+            "condition": {
+              "VarKey": null,
+              "Value": "$= String.Equals({模式}, \"flowith\")"
+            }
+          },
+          "OutputParams": {},
+          "IfSteps": [
+            {
+              "StepRunnerKey": "sys:assign",
+              "InputParams": {
+                "input": {
+                  "VarKey": null,
+                  "Value": "https://flowith.io/"
+                },
+                "stopIfFail": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {
+                "isSuccess": null,
+                "output": "url",
+                "errMessage": null
+              },
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            },
+            {
+              "StepRunnerKey": "sys:assign",
+              "InputParams": {
+                "input": {
+                  "VarKey": null,
+                  "Value": "50%,75%"
+                },
+                "stopIfFail": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {
+                "isSuccess": null,
+                "output": "url_size",
+                "errMessage": null
+              },
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            }
+          ],
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": true,
+          "DelayMs": 0
+        }
+      ],
+      "SubPrograms": null,
+      "TemplateId": null,
+      "TemplateRevision": 0,
+      "UseServerVersion": null,
+      "IsProtected": null,
+      "SharedId": null,
+      "ShareTimeUtc": null
+    },
+    {
+      "Id": "cdb7ff29-0cc4-409c-998e-04d9eb5e85e7",
+      "Icon": null,
+      "Name": "控件名赋值",
+      "Description": "",
+      "SummaryExpression": "$$",
+      "CreateTimeUtc": "2025-03-18T05:50:26.1832823Z",
+      "LastEditTimeUtc": "2025-03-20T02:40:19.1335394Z",
+      "IsLocalEdited": true,
+      "Variables": [
+        {
+          "Key": "模式",
+          "Type": 0,
+          "Desc": "",
+          "DefaultValue": "deepseek",
+          "SaveState": false,
+          "IsInput": true,
+          "IsOutput": false,
+          "ParamName": "",
+          "InputParamInfo": null,
+          "OutputParamInfo": null,
+          "TableDef": null,
+          "CustomType": null,
+          "Group": "setting"
+        },
+        {
+          "Key": "控件名",
+          "Type": 0,
+          "Desc": "",
+          "DefaultValue": "",
+          "SaveState": false,
+          "IsInput": false,
+          "IsOutput": true,
+          "ParamName": "",
+          "InputParamInfo": null,
+          "OutputParamInfo": null,
+          "TableDef": null,
+          "CustomType": null,
+          "Group": "setting"
+        }
+      ],
+      "Steps": [
+        {
+          "StepRunnerKey": "sys:simpleIf",
+          "InputParams": {
+            "condition": {
+              "VarKey": null,
+              "Value": "$= String.Equals({模式}, \"deepseek\")"
+            }
+          },
+          "OutputParams": {},
+          "IfSteps": [
+            {
+              "StepRunnerKey": "sys:assign",
+              "InputParams": {
+                "input": {
+                  "VarKey": null,
+                  "Value": "给 DeepSeek 发消息"
+                },
+                "stopIfFail": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {
+                "isSuccess": null,
+                "output": "控件名",
+                "errMessage": null
+              },
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            }
+          ],
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": true,
+          "DelayMs": 0
+        },
+        {
+          "StepRunnerKey": "sys:simpleIf",
+          "InputParams": {
+            "condition": {
+              "VarKey": null,
+              "Value": "$= String.Equals({模式}, \"Monica\")"
+            }
+          },
+          "OutputParams": {},
+          "IfSteps": [
+            {
+              "StepRunnerKey": "sys:assign",
+              "InputParams": {
+                "input": {
+                  "VarKey": null,
+                  "Value": "问我任何问题..."
+                },
+                "stopIfFail": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {
+                "isSuccess": null,
+                "output": "控件名",
+                "errMessage": null
+              },
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            }
+          ],
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": true,
+          "DelayMs": 0
+        },
+        {
+          "StepRunnerKey": "sys:simpleIf",
+          "InputParams": {
+            "condition": {
+              "VarKey": null,
+              "Value": "$= String.Equals({模式}, \"claude\")"
+            }
+          },
+          "OutputParams": {},
+          "IfSteps": [
+            {
+              "StepRunnerKey": "sys:assign",
+              "InputParams": {
+                "input": {
+                  "VarKey": null,
+                  "Value": ""
+                },
+                "stopIfFail": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {
+                "isSuccess": null,
+                "output": "控件名",
+                "errMessage": null
+              },
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            }
+          ],
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": true,
+          "DelayMs": 0
+        },
+        {
+          "StepRunnerKey": "sys:simpleIf",
+          "InputParams": {
+            "condition": {
+              "VarKey": null,
+              "Value": "$= String.Equals({模式}, \"gemini\")"
+            }
+          },
+          "OutputParams": {},
+          "IfSteps": [
+            {
+              "StepRunnerKey": "sys:assign",
+              "InputParams": {
+                "input": {
+                  "VarKey": null,
+                  "Value": "Enter a prompt here"
+                },
+                "stopIfFail": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {
+                "isSuccess": null,
+                "output": "控件名",
+                "errMessage": null
+              },
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            }
+          ],
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": true,
+          "DelayMs": 0
+        },
+        {
+          "StepRunnerKey": "sys:simpleIf",
+          "InputParams": {
+            "condition": {
+              "VarKey": null,
+              "Value": "$= String.Equals({模式}, \"通义千问\")"
+            }
+          },
+          "OutputParams": {},
+          "IfSteps": [
+            {
+              "StepRunnerKey": "sys:assign",
+              "InputParams": {
+                "input": {
+                  "VarKey": null,
+                  "Value": "有什么我能帮您的吗？"
+                },
+                "stopIfFail": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {
+                "isSuccess": null,
+                "output": "控件名",
+                "errMessage": null
+              },
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            }
+          ],
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": true,
+          "DelayMs": 0
+        },
+        {
+          "StepRunnerKey": "sys:simpleIf",
+          "InputParams": {
+            "condition": {
+              "VarKey": null,
+              "Value": "$= String.Equals({模式}, \"blackbox\")"
+            }
+          },
+          "OutputParams": {},
+          "IfSteps": [
+            {
+              "StepRunnerKey": "sys:assign",
+              "InputParams": {
+                "input": {
+                  "VarKey": null,
+                  "Value": ""
+                },
+                "stopIfFail": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {
+                "isSuccess": null,
+                "output": "控件名",
+                "errMessage": null
+              },
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            }
+          ],
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": true,
+          "DelayMs": 0
+        },
+        {
+          "StepRunnerKey": "sys:simpleIf",
+          "InputParams": {
+            "condition": {
+              "VarKey": null,
+              "Value": "$= String.Equals({模式}, \"grok\")"
+            }
+          },
+          "OutputParams": {},
+          "IfSteps": [
+            {
+              "StepRunnerKey": "sys:assign",
+              "InputParams": {
+                "input": {
+                  "VarKey": null,
+                  "Value": ""
+                },
+                "stopIfFail": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {
+                "isSuccess": null,
+                "output": "控件名",
+                "errMessage": null
+              },
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            }
+          ],
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": true,
+          "DelayMs": 0
+        },
+        {
+          "StepRunnerKey": "sys:simpleIf",
+          "InputParams": {
+            "condition": {
+              "VarKey": null,
+              "Value": "$= String.Equals({模式}, \"智谱清言\")"
+            }
+          },
+          "OutputParams": {},
+          "IfSteps": [
+            {
+              "StepRunnerKey": "sys:assign",
+              "InputParams": {
+                "input": {
+                  "VarKey": null,
+                  "Value": "输入@，召唤智能体"
+                },
+                "stopIfFail": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {
+                "isSuccess": null,
+                "output": "控件名",
+                "errMessage": null
+              },
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            }
+          ],
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": true,
+          "DelayMs": 0
+        },
+        {
+          "StepRunnerKey": "sys:simpleIf",
+          "InputParams": {
+            "condition": {
+              "VarKey": null,
+              "Value": "$= String.Equals({模式}, \"Kimi\")"
+            }
+          },
+          "OutputParams": {},
+          "IfSteps": [
+            {
+              "StepRunnerKey": "sys:assign",
+              "InputParams": {
+                "input": {
+                  "VarKey": null,
+                  "Value": ""
+                },
+                "stopIfFail": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {
+                "isSuccess": null,
+                "output": "控件名",
+                "errMessage": null
+              },
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            }
+          ],
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": true,
+          "DelayMs": 0
+        },
+        {
+          "StepRunnerKey": "sys:simpleIf",
+          "InputParams": {
+            "condition": {
+              "VarKey": null,
+              "Value": "$= String.Equals({模式}, \"bolt\")"
+            }
+          },
+          "OutputParams": {},
+          "IfSteps": [
+            {
+              "StepRunnerKey": "sys:assign",
+              "InputParams": {
+                "input": {
+                  "VarKey": null,
+                  "Value": ""
+                },
+                "stopIfFail": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {
+                "isSuccess": null,
+                "output": "控件名",
+                "errMessage": null
+              },
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            }
+          ],
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": true,
+          "DelayMs": 0
+        },
+        {
+          "StepRunnerKey": "sys:simpleIf",
+          "InputParams": {
+            "condition": {
+              "VarKey": null,
+              "Value": "$= String.Equals({模式}, \"flowith\")"
+            }
+          },
+          "OutputParams": {},
+          "IfSteps": [
+            {
+              "StepRunnerKey": "sys:assign",
+              "InputParams": {
+                "input": {
+                  "VarKey": null,
+                  "Value": ""
+                },
+                "stopIfFail": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {
+                "isSuccess": null,
+                "output": "控件名",
+                "errMessage": null
+              },
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            }
+          ],
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": true,
+          "DelayMs": 0
+        }
+      ],
+      "SubPrograms": null,
+      "TemplateId": null,
+      "TemplateRevision": 0,
+      "UseServerVersion": null,
+      "IsProtected": null,
+      "SharedId": null,
+      "ShareTimeUtc": null
+    }
+  ],
+  "Variables": [
+    {
+      "Key": "模式",
+      "Type": 0,
+      "Desc": "",
+      "DefaultValue": "deepseek",
+      "SaveState": true,
+      "IsInput": false,
+      "IsOutput": false,
+      "ParamName": "",
+      "InputParamInfo": null,
+      "OutputParamInfo": null,
+      "TableDef": null,
+      "CustomType": null,
+      "Group": "setting"
+    },
+    {
+      "Key": "chat_mode",
+      "Type": 0,
+      "Desc": "截图和文本两种模式",
+      "DefaultValue": "文本",
+      "SaveState": true,
+      "IsInput": false,
+      "IsOutput": false,
+      "ParamName": "",
+      "InputParamInfo": null,
+      "OutputParamInfo": null,
+      "TableDef": null,
+      "CustomType": null,
+      "Group": ""
+    },
+    {
+      "Key": "image",
+      "Type": 3,
+      "Desc": "",
+      "DefaultValue": "",
+      "SaveState": false,
+      "IsInput": false,
+      "IsOutput": false,
+      "ParamName": "",
+      "InputParamInfo": null,
+      "OutputParamInfo": null,
+      "TableDef": null,
+      "CustomType": null,
+      "Group": null
+    },
+    {
+      "Key": "是否获取到文本",
+      "Type": 2,
+      "Desc": "",
+      "DefaultValue": "",
+      "SaveState": false,
+      "IsInput": false,
+      "IsOutput": false,
+      "ParamName": "",
+      "InputParamInfo": null,
+      "OutputParamInfo": null,
+      "TableDef": null,
+      "CustomType": null,
+      "Group": ""
+    },
+    {
+      "Key": "是否成功",
+      "Type": 2,
+      "Desc": "",
+      "DefaultValue": "",
+      "SaveState": false,
+      "IsInput": false,
+      "IsOutput": false,
+      "ParamName": "",
+      "InputParamInfo": null,
+      "OutputParamInfo": null,
+      "TableDef": null,
+      "CustomType": null,
+      "Group": ""
+    },
+    {
+      "Key": "是否加载完成",
+      "Type": 2,
+      "Desc": "",
+      "DefaultValue": "",
+      "SaveState": false,
+      "IsInput": false,
+      "IsOutput": false,
+      "ParamName": "",
+      "InputParamInfo": null,
+      "OutputParamInfo": null,
+      "TableDef": null,
+      "CustomType": null,
+      "Group": ""
+    },
+    {
+      "Key": "url",
+      "Type": 0,
+      "Desc": "",
+      "DefaultValue": "",
+      "SaveState": false,
+      "IsInput": false,
+      "IsOutput": false,
+      "ParamName": "",
+      "InputParamInfo": null,
+      "OutputParamInfo": null,
+      "TableDef": null,
+      "CustomType": null,
+      "Group": "setting"
+    },
+    {
+      "Key": "url_size",
+      "Type": 0,
+      "Desc": "",
+      "DefaultValue": "",
+      "SaveState": false,
+      "IsInput": false,
+      "IsOutput": false,
+      "ParamName": "",
+      "InputParamInfo": null,
+      "OutputParamInfo": null,
+      "TableDef": null,
+      "CustomType": null,
+      "Group": "setting"
+    },
+    {
+      "Key": "获取的文本",
+      "Type": 0,
+      "Desc": "",
+      "DefaultValue": "",
+      "SaveState": false,
+      "IsInput": false,
+      "IsOutput": false,
+      "ParamName": "",
+      "InputParamInfo": null,
+      "OutputParamInfo": null,
+      "TableDef": null,
+      "CustomType": null,
+      "Group": "setting"
+    },
+    {
+      "Key": "截图提示词",
+      "Type": 0,
+      "Desc": "",
+      "DefaultValue": "解释图片",
+      "SaveState": true,
+      "IsInput": false,
+      "IsOutput": false,
+      "ParamName": "",
+      "InputParamInfo": null,
+      "OutputParamInfo": null,
+      "TableDef": null,
+      "CustomType": null,
+      "Group": "setting"
+    },
+    {
+      "Key": "文本提示词",
+      "Type": 0,
+      "Desc": "",
+      "DefaultValue": "解释文本",
+      "SaveState": true,
+      "IsInput": false,
+      "IsOutput": false,
+      "ParamName": "",
+      "InputParamInfo": null,
+      "OutputParamInfo": null,
+      "TableDef": null,
+      "CustomType": null,
+      "Group": "setting"
+    },
+    {
+      "Key": "控件名",
+      "Type": 0,
+      "Desc": "",
+      "DefaultValue": "",
+      "SaveState": false,
+      "IsInput": false,
+      "IsOutput": false,
+      "ParamName": "",
+      "InputParamInfo": null,
+      "OutputParamInfo": null,
+      "TableDef": null,
+      "CustomType": null,
+      "Group": "setting"
+    },
+    {
+      "Key": "是否初次运行",
+      "Type": 2,
+      "Desc": "",
+      "DefaultValue": "",
+      "SaveState": false,
+      "IsInput": false,
+      "IsOutput": false,
+      "ParamName": "",
+      "InputParamInfo": null,
+      "OutputParamInfo": null,
+      "TableDef": null,
+      "CustomType": null,
+      "Group": ""
+    },
+    {
+      "Key": "web窗口是否存在",
+      "Type": 2,
+      "Desc": "",
+      "DefaultValue": "",
+      "SaveState": false,
+      "IsInput": false,
+      "IsOutput": false,
+      "ParamName": "",
+      "InputParamInfo": null,
+      "OutputParamInfo": null,
+      "TableDef": null,
+      "CustomType": null,
+      "Group": ""
+    },
+    {
+      "Key": "是否存在",
+      "Type": 2,
+      "Desc": "",
+      "DefaultValue": "",
+      "SaveState": false,
+      "IsInput": false,
+      "IsOutput": false,
+      "ParamName": "",
+      "InputParamInfo": null,
+      "OutputParamInfo": null,
+      "TableDef": null,
+      "CustomType": null,
+      "Group": ""
+    }
+  ],
+  "Steps": [
+    {
+      "StepRunnerKey": "sys:subprogram",
+      "InputParams": {
+        "subProgram": {
+          "VarKey": null,
+          "Value": "@@df8b7fe3-2d68-401f-4322-08d8a2edd8b8@1@是否初次运行"
+        },
+        "stopIfFail": {
+          "VarKey": null,
+          "Value": "1"
+        },
+        "skipDebugOutput": {
+          "VarKey": null,
+          "Value": "1"
+        }
+      },
+      "OutputParams": {
+        "isSuccess": null,
+        "var:是否初次运行": "是否初次运行",
+        "errMessage": null
+      },
+      "IfSteps": null,
+      "ElseSteps": null,
+      "Note": "",
+      "Disabled": false,
+      "Collapsed": false,
+      "DelayMs": 0
+    },
+    {
+      "StepRunnerKey": "sys:simpleIf",
+      "InputParams": {
+        "condition": {
+          "VarKey": "是否初次运行",
+          "Value": null
+        }
+      },
+      "OutputParams": {},
+      "IfSteps": [
+        {
+          "StepRunnerKey": "sys:notify",
+          "InputParams": {
+            "type": {
+              "VarKey": null,
+              "Value": "Info"
+            },
+            "msg": {
+              "VarKey": null,
+              "Value": "请先登录，偶尔有bug要手动关闭动作"
+            },
+            "maxLines": {
+              "VarKey": null,
+              "Value": "0"
+            },
+            "style": {
+              "VarKey": null,
+              "Value": "Default"
+            },
+            "clickAction": {
+              "VarKey": null,
+              "Value": ""
+            }
+          },
+          "OutputParams": {},
+          "IfSteps": null,
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": false,
+          "DelayMs": 0
+        }
+      ],
+      "ElseSteps": null,
+      "Note": "",
+      "Disabled": false,
+      "Collapsed": true,
+      "DelayMs": 0
+    },
+    {
+      "StepRunnerKey": "sys:simpleIf",
+      "InputParams": {
+        "condition": {
+          "VarKey": null,
+          "Value": "$= {quicker_in_param} == \"设置\""
+        }
+      },
+      "OutputParams": {},
+      "IfSteps": [
+        {
+          "StepRunnerKey": "sys:form",
+          "InputParams": {
+            "operation": {
+              "VarKey": null,
+              "Value": "variables"
+            },
+            "title": {
+              "VarKey": null,
+              "Value": "选择模型"
+            },
+            "formDef": {
+              "VarKey": null,
+              "Value": "{\"Fields\":[{\"FieldKey\":\"模式\",\"DictVarType\":null,\"Label\":\"模型\",\"HelpText\":\"\",\"HelpLink\":null,\"InputMethod\":3,\"SelectionItems\":\"deepseek\\r\\nMonica\\r\\n智谱清言\\r\\nKimi\\r\\n通义千问\\r\\nclaude\\r\\ngemini\\r\\nblackbox\\r\\ngrok\\r\\nbolt\\r\\nflowith\\r\\n\\r\\n\",\"IsRequired\":true,\"MinValue\":\"\",\"MaxValue\":\"\",\"Pattern\":\"\",\"InputWidth\":\"\",\"MaxLength\":0,\"ImeState\":null,\"TextTools\":\"\",\"ExtraSettings\":\"\",\"VisibleExpression\":\"\",\"DefaultValue\":null,\"ColumnWidth\":0.0,\"OnlyDate\":false,\"ReadOnly\":false,\"Group\":\"\"}]}"
+            },
+            "help": {
+              "VarKey": null,
+              "Value": ""
+            },
+            "titleColumnWidth": {
+              "VarKey": null,
+              "Value": "100"
+            },
+            "windowWidth": {
+              "VarKey": null,
+              "Value": "500"
+            },
+            "windowHeight": {
+              "VarKey": null,
+              "Value": "0"
+            },
+            "restoreFocus": {
+              "VarKey": null,
+              "Value": "0"
+            },
+            "topMost": {
+              "VarKey": null,
+              "Value": "false"
+            },
+            "disableEnterSubmit": {
+              "VarKey": null,
+              "Value": "0"
+            },
+            "stopIfFail": {
+              "VarKey": null,
+              "Value": "1"
+            },
+            "markdownhelp": {
+              "VarKey": null,
+              "Value": ""
+            },
+            "defaultInputWidth": {
+              "VarKey": null,
+              "Value": "0"
+            },
+            "confirm": {
+              "VarKey": null,
+              "Value": ""
+            },
+            "customButtons": {
+              "VarKey": null,
+              "Value": ""
+            },
+            "selectedGroup": {
+              "VarKey": null,
+              "Value": ""
+            },
+            "winLocation": {
+              "VarKey": null,
+              "Value": "CenterScreen"
+            },
+            "winSize": {
+              "VarKey": null,
+              "Value": ""
+            }
+          },
+          "OutputParams": {
+            "isSuccess": null,
+            "button": null,
+            "selectedGroup": null,
+            "errMessage": null
+          },
+          "IfSteps": null,
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": false,
+          "DelayMs": 0
+        },
+        {
+          "StepRunnerKey": "sys:stop",
+          "InputParams": {
+            "method": {
+              "VarKey": null,
+              "Value": "default"
+            },
+            "isError": {
+              "VarKey": null,
+              "Value": "0"
+            },
+            "return": {
+              "VarKey": null,
+              "Value": ""
+            },
+            "showMessage": {
+              "VarKey": null,
+              "Value": ""
+            }
+          },
+          "OutputParams": {},
+          "IfSteps": null,
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": false,
+          "DelayMs": 0
+        }
+      ],
+      "ElseSteps": null,
+      "Note": "",
+      "Disabled": false,
+      "Collapsed": true,
+      "DelayMs": 0
+    },
+    {
+      "StepRunnerKey": "sys:simpleIf",
+      "InputParams": {
+        "condition": {
+          "VarKey": null,
+          "Value": "$= {quicker_in_param} == \"提示词\""
+        }
+      },
+      "OutputParams": {},
+      "IfSteps": [
+        {
+          "StepRunnerKey": "sys:form",
+          "InputParams": {
+            "operation": {
+              "VarKey": null,
+              "Value": "variables"
+            },
+            "title": {
+              "VarKey": null,
+              "Value": "选择提示词"
+            },
+            "formDef": {
+              "VarKey": null,
+              "Value": "{\"Fields\":[{\"FieldKey\":\"截图提示词\",\"DictVarType\":null,\"Label\":\"截图提示词\",\"HelpText\":\"\",\"HelpLink\":null,\"InputMethod\":13,\"SelectionItems\":\"解释图片\\r\\n提取文字\\r\\n反推提示词\\r\\n搜图\\r\\n翻译图片\",\"IsRequired\":false,\"MinValue\":\"\",\"MaxValue\":\"\",\"Pattern\":\"\",\"InputWidth\":\"\",\"MaxLength\":0,\"ImeState\":null,\"TextTools\":\"\",\"ExtraSettings\":\"\",\"VisibleExpression\":\"\",\"DefaultValue\":null,\"ColumnWidth\":0.0,\"OnlyDate\":false,\"ReadOnly\":false,\"Group\":\"截图模式\"},{\"FieldKey\":\"文本提示词\",\"DictVarType\":null,\"Label\":\"文本提示词\",\"HelpText\":\"\",\"HelpLink\":null,\"InputMethod\":13,\"SelectionItems\":\"解释文本\\r\\ndebug\\r\\n翻译\\r\\n总结\\r\\n美化排版\\r\\n改写\",\"IsRequired\":false,\"MinValue\":\"\",\"MaxValue\":\"\",\"Pattern\":\"\",\"InputWidth\":\"\",\"MaxLength\":0,\"ImeState\":null,\"TextTools\":\"\",\"ExtraSettings\":\"\",\"VisibleExpression\":\"\",\"DefaultValue\":null,\"ColumnWidth\":0.0,\"OnlyDate\":false,\"ReadOnly\":false,\"Group\":\"文本模式\"}]}"
+            },
+            "help": {
+              "VarKey": null,
+              "Value": ""
+            },
+            "titleColumnWidth": {
+              "VarKey": null,
+              "Value": "100"
+            },
+            "windowWidth": {
+              "VarKey": null,
+              "Value": "500"
+            },
+            "windowHeight": {
+              "VarKey": null,
+              "Value": "0"
+            },
+            "restoreFocus": {
+              "VarKey": null,
+              "Value": "0"
+            },
+            "topMost": {
+              "VarKey": null,
+              "Value": "false"
+            },
+            "disableEnterSubmit": {
+              "VarKey": null,
+              "Value": "0"
+            },
+            "stopIfFail": {
+              "VarKey": null,
+              "Value": "0"
+            },
+            "markdownhelp": {
+              "VarKey": null,
+              "Value": ""
+            },
+            "defaultInputWidth": {
+              "VarKey": null,
+              "Value": "0"
+            },
+            "confirm": {
+              "VarKey": null,
+              "Value": ""
+            },
+            "customButtons": {
+              "VarKey": null,
+              "Value": ""
+            },
+            "selectedGroup": {
+              "VarKey": null,
+              "Value": ""
+            },
+            "winLocation": {
+              "VarKey": null,
+              "Value": "CenterScreen"
+            },
+            "winSize": {
+              "VarKey": null,
+              "Value": ""
+            }
+          },
+          "OutputParams": {
+            "isSuccess": null,
+            "button": null,
+            "selectedGroup": null,
+            "errMessage": null
+          },
+          "IfSteps": null,
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": false,
+          "DelayMs": 0
+        },
+        {
+          "StepRunnerKey": "sys:stop",
+          "InputParams": {
+            "method": {
+              "VarKey": null,
+              "Value": "default"
+            },
+            "isError": {
+              "VarKey": null,
+              "Value": "0"
+            },
+            "return": {
+              "VarKey": null,
+              "Value": ""
+            },
+            "showMessage": {
+              "VarKey": null,
+              "Value": ""
+            }
+          },
+          "OutputParams": {},
+          "IfSteps": null,
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": false,
+          "DelayMs": 0
+        }
+      ],
+      "ElseSteps": null,
+      "Note": "",
+      "Disabled": false,
+      "Collapsed": true,
+      "DelayMs": 0
+    },
+    {
+      "StepRunnerKey": "sys:simpleIf",
+      "InputParams": {
+        "condition": {
+          "VarKey": null,
+          "Value": "$= {quicker_in_param} == \"text_mode\""
+        }
+      },
+      "OutputParams": {},
+      "IfSteps": [
+        {
+          "StepRunnerKey": "sys:assign",
+          "InputParams": {
+            "input": {
+              "VarKey": null,
+              "Value": "文本"
+            },
+            "stopIfFail": {
+              "VarKey": null,
+              "Value": "1"
+            }
+          },
+          "OutputParams": {
+            "isSuccess": null,
+            "output": "chat_mode",
+            "errMessage": null
+          },
+          "IfSteps": null,
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": false,
+          "DelayMs": 0
+        },
+        {
+          "StepRunnerKey": "sys:simpleIf",
+          "InputParams": {
+            "condition": {
+              "VarKey": null,
+              "Value": "$= String.Equals({文本提示词}, \"解释文本\")"
+            }
+          },
+          "OutputParams": {},
+          "IfSteps": [
+            {
+              "StepRunnerKey": "sys:assign",
+              "InputParams": {
+                "input": {
+                  "VarKey": null,
+                  "Value": "你是一位专业的文本解释专家。你的唯一任务是解释用户输入的文本含义，帮助用户理解文本的具体内容。要求：\r\n1. 只关注解释文本的字面含义和内在逻辑\r\n2. 使用清晰、准确的语言进行解释\r\n3. 不要回答任何与文本解释无关的问题\r\n4. 不要提供建议、评价或额外信息\r\n5. 如果用户输入的不是需要解释的文本，请提醒用户输入待解释的具体文本内容"
+                },
+                "stopIfFail": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {
+                "isSuccess": null,
+                "output": "文本提示词",
+                "errMessage": null
+              },
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            }
+          ],
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": true,
+          "DelayMs": 0
+        },
+        {
+          "StepRunnerKey": "sys:simpleIf",
+          "InputParams": {
+            "condition": {
+              "VarKey": null,
+              "Value": "$= String.Equals({文本提示词}, \"debug\")"
+            }
+          },
+          "OutputParams": {},
+          "IfSteps": [
+            {
+              "StepRunnerKey": "sys:assign",
+              "InputParams": {
+                "input": {
+                  "VarKey": null,
+                  "Value": "你是一位专业的代码调试专家，擅长分析和解决各类编程问题。你的主要职责包括：\r\n1. 仔细分析用户提供的代码和错误信息\r\n2. 识别代码中的潜在问题和bug\r\n3. 提供详细的修复方案和优化建议\r\n\r\n当用户提供代码时，请按以下步骤进行：\r\n1. 首先分析错误信息或异常行为\r\n2. 定位问题代码段落\r\n3. 解释问题产生的原因\r\n4. 提供具体的修复代码\r\n5. 说明修复方案的原理\r\n\r\n你的回答应包含：\r\n- 问题定位和分析\r\n- 修复后的代码片段\r\n- 修复原理说明\r\n- 可能的优化建议\r\n\r\n如果用户提供的信息不完整，请询问：\r\n1. 完整的错误信息\r\n2. 相关的代码上下文\r\n3. 运行环境信息\r\n4. 预期的正确行为\r\n"
+                },
+                "stopIfFail": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {
+                "isSuccess": null,
+                "output": "文本提示词",
+                "errMessage": null
+              },
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            }
+          ],
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": true,
+          "DelayMs": 0
+        },
+        {
+          "StepRunnerKey": "sys:simpleIf",
+          "InputParams": {
+            "condition": {
+              "VarKey": null,
+              "Value": "$= String.Equals({文本提示词}, \"翻译\")"
+            }
+          },
+          "OutputParams": {},
+          "IfSteps": [
+            {
+              "StepRunnerKey": "sys:assign",
+              "InputParams": {
+                "input": {
+                  "VarKey": null,
+                  "Value": "你是一个中英文翻译专家，将用户输入的中文翻译成英文，或将用户输入的英文翻译成中文。对于非中文内容，它将提供中文翻译结果。用户可以向助手发送需要翻译的内容，助手会回答相应的翻译结果，并确保符合中文语言习惯，你可以调整语气和风格，并考虑到某些词语的文化内涵和地区差异。同时作为翻译家，需将原文翻译成具有信达雅标准的译文。\"信\" 即忠实于原文的内容与意图；\"达\" 意味着译文应通顺易懂，表达清晰；\"雅\" 则追求译文的文化审美和语言的优美。目标是创作出既忠于原作精神，又符合目标语言文化和读者审美的翻译。"
+                },
+                "stopIfFail": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {
+                "isSuccess": null,
+                "output": "文本提示词",
+                "errMessage": null
+              },
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            }
+          ],
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": true,
+          "DelayMs": 0
+        },
+        {
+          "StepRunnerKey": "sys:simpleIf",
+          "InputParams": {
+            "condition": {
+              "VarKey": null,
+              "Value": "$= String.Equals({文本提示词}, \"总结\")"
+            }
+          },
+          "OutputParams": {},
+          "IfSteps": [
+            {
+              "StepRunnerKey": "sys:assign",
+              "InputParams": {
+                "input": {
+                  "VarKey": null,
+                  "Value": "你是一位专业的内容总结专家。你的任务是将用户提供的内容进行精炼概括，提取核心要点。具体要求：\r\n1. 保持客观准确，不添加个人观点\r\n2. 按重要性排序提取关键信息\r\n3. 使用简洁清晰的语言\r\n4. 保持原文的核心含义不变\r\n5. 总结应当包含主题、要点和结论\r\n6. 如果内容不完整或不清晰，请询问用户补充信息"
+                },
+                "stopIfFail": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {
+                "isSuccess": null,
+                "output": "文本提示词",
+                "errMessage": null
+              },
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            }
+          ],
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": true,
+          "DelayMs": 0
+        },
+        {
+          "StepRunnerKey": "sys:simpleIf",
+          "InputParams": {
+            "condition": {
+              "VarKey": null,
+              "Value": "$= String.Equals({文本提示词}, \"美化排版\")"
+            }
+          },
+          "OutputParams": {},
+          "IfSteps": [
+            {
+              "StepRunnerKey": "sys:assign",
+              "InputParams": {
+                "input": {
+                  "VarKey": null,
+                  "Value": "你是一位专业的排版美化专家，擅长优化各类内容的格式和布局。你的任务是：\r\n1. 识别输入内容的类型（文章或代码）\r\n2. 根据内容类型应用最佳的排版规则：\r\n   - 文章：规范段落间距、标点符号、缩进、对齐方式\r\n   - 代码：统一代码缩进、格式化括号和运算符、优化空行分布\r\n3. 保持原始内容的完整性和语义不变\r\n4. 输出美化后的内容，并保持合适的空白区域\r\n5. 如果内容格式存在严重问题，指出具体改进建议"
+                },
+                "stopIfFail": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {
+                "isSuccess": null,
+                "output": "文本提示词",
+                "errMessage": null
+              },
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            }
+          ],
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": true,
+          "DelayMs": 0
+        },
+        {
+          "StepRunnerKey": "sys:simpleIf",
+          "InputParams": {
+            "condition": {
+              "VarKey": null,
+              "Value": "$= String.Equals({文本提示词}, \"改写\")"
+            }
+          },
+          "OutputParams": {},
+          "IfSteps": [
+            {
+              "StepRunnerKey": "sys:assign",
+              "InputParams": {
+                "input": {
+                  "VarKey": null,
+                  "Value": "你是一位精通中文写作的改写专家。你的任务是用地道的简体中文重写用户提供的内容，要求：\r\n1. 保持原文的核心意思和风格特点\r\n2. 使用自然流畅的白话文表达\r\n3. 避免机械化、生硬的翻译腔\r\n4. 确保用词准确、句式灵活\r\n5. 不要过度修饰，保持语言的力度\r\n6. 如果原文含义不明，请询问用户具体意图"
+                },
+                "stopIfFail": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {
+                "isSuccess": null,
+                "output": "文本提示词",
+                "errMessage": null
+              },
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            }
+          ],
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": true,
+          "DelayMs": 0
+        },
+        {
+          "StepRunnerKey": "sys:stop",
+          "InputParams": {
+            "method": {
+              "VarKey": null,
+              "Value": "default"
+            },
+            "isError": {
+              "VarKey": null,
+              "Value": "0"
+            },
+            "return": {
+              "VarKey": null,
+              "Value": ""
+            },
+            "showMessage": {
+              "VarKey": null,
+              "Value": ""
+            }
+          },
+          "OutputParams": {},
+          "IfSteps": null,
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": false,
+          "DelayMs": 0
+        }
+      ],
+      "ElseSteps": null,
+      "Note": "",
+      "Disabled": false,
+      "Collapsed": true,
+      "DelayMs": 0
+    },
+    {
+      "StepRunnerKey": "sys:simpleIf",
+      "InputParams": {
+        "condition": {
+          "VarKey": null,
+          "Value": "$= {quicker_in_param} == \"img_mode\""
+        }
+      },
+      "OutputParams": {},
+      "IfSteps": [
+        {
+          "StepRunnerKey": "sys:assign",
+          "InputParams": {
+            "input": {
+              "VarKey": null,
+              "Value": "截图"
+            },
+            "stopIfFail": {
+              "VarKey": null,
+              "Value": "1"
+            }
+          },
+          "OutputParams": {
+            "isSuccess": null,
+            "output": "chat_mode",
+            "errMessage": null
+          },
+          "IfSteps": null,
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": false,
+          "DelayMs": 0
+        },
+        {
+          "StepRunnerKey": "sys:simpleIf",
+          "InputParams": {
+            "condition": {
+              "VarKey": null,
+              "Value": "$= String.Equals({截图提示词}, \"解释图片\")"
+            }
+          },
+          "OutputParams": {},
+          "IfSteps": [
+            {
+              "StepRunnerKey": "sys:assign",
+              "InputParams": {
+                "input": {
+                  "VarKey": null,
+                  "Value": "详细分析并解释这张图。"
+                },
+                "stopIfFail": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {
+                "isSuccess": null,
+                "output": "截图提示词",
+                "errMessage": null
+              },
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            }
+          ],
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": true,
+          "DelayMs": 0
+        },
+        {
+          "StepRunnerKey": "sys:simpleIf",
+          "InputParams": {
+            "condition": {
+              "VarKey": null,
+              "Value": "$= String.Equals({截图提示词}, \"提取文字\")"
+            }
+          },
+          "OutputParams": {},
+          "IfSteps": [
+            {
+              "StepRunnerKey": "sys:assign",
+              "InputParams": {
+                "input": {
+                  "VarKey": null,
+                  "Value": "阅读图片提取文字，请准确完整、一字不落，并遵循图中原本排版结构，以Markdown格式排版输出。"
+                },
+                "stopIfFail": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {
+                "isSuccess": null,
+                "output": "截图提示词",
+                "errMessage": null
+              },
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            }
+          ],
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": true,
+          "DelayMs": 0
+        },
+        {
+          "StepRunnerKey": "sys:simpleIf",
+          "InputParams": {
+            "condition": {
+              "VarKey": null,
+              "Value": "$= String.Equals({截图提示词}, \"反推提示词\")"
+            }
+          },
+          "OutputParams": {},
+          "IfSteps": [
+            {
+              "StepRunnerKey": "sys:assign",
+              "InputParams": {
+                "input": {
+                  "VarKey": null,
+                  "Value": "请分析图片反推提示词，写一个用于即梦AI生图的提示词，\r\n\t- 提示词格式如下：\r\n\t\t-词组：[主体][环境][风格][色彩][构图]\r\n\t\t-自然语言：画面描述"
+                },
+                "stopIfFail": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {
+                "isSuccess": null,
+                "output": "截图提示词",
+                "errMessage": null
+              },
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            }
+          ],
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": true,
+          "DelayMs": 0
+        },
+        {
+          "StepRunnerKey": "sys:simpleIf",
+          "InputParams": {
+            "condition": {
+              "VarKey": null,
+              "Value": "$= String.Equals({截图提示词}, \"以图搜图\")"
+            }
+          },
+          "OutputParams": {},
+          "IfSteps": [
+            {
+              "StepRunnerKey": "sys:assign",
+              "InputParams": {
+                "input": {
+                  "VarKey": null,
+                  "Value": "role：你是一位图片素材搜索专家，熟悉 Shutterstock、IStock 、pinterest和freepik等主流图库平台，擅长分析需求并提供精准搜索建议。\r\n\r\ncompetencies：\r\n- 图片分析：分析上传图片的主体、构图、色调、风格和场景\r\n- 意图理解：精准把握用户需求和应用场景\r\n- 搜索优化：提供中英文对照关键词，确保搜索结果理想\r\n\r\nworkflow：\r\n图片输入时：\r\n1. 分析图片视觉元素和风格特征\r\n2. 推测可能的使用场景和需求\r\n3. 提供搜索建议：\r\n   - 主要搜索词（中英对照）\r\n   - 修饰词（细化结果）\r\n   - 适用平台建议\r\n\r\n文字输入时：\r\n1. 理解用户描述的需求和场景\r\n2. 转化为专业的图库搜索语言\r\n3. 提供搜索建议：\r\n   - 核心关键词（中英对照）\r\n   - 场景相关词\r\n   - 风格定义词\r\n\r\nlimitation：\r\n- 保持⌜专业简洁⌟的表达风格\r\n- 提供⌜最有效的搜索组合⌟而非列举所有可能\r\n- 补充⌜专业建议⌟帮助获得更好结果"
+                },
+                "stopIfFail": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {
+                "isSuccess": null,
+                "output": "截图提示词",
+                "errMessage": null
+              },
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            }
+          ],
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": true,
+          "DelayMs": 0
+        },
+        {
+          "StepRunnerKey": "sys:simpleIf",
+          "InputParams": {
+            "condition": {
+              "VarKey": null,
+              "Value": "$= String.Equals({截图提示词}, \"翻译图片\")"
+            }
+          },
+          "OutputParams": {},
+          "IfSteps": [
+            {
+              "StepRunnerKey": "sys:assign",
+              "InputParams": {
+                "input": {
+                  "VarKey": null,
+                  "Value": "翻译成中文，并按图中的格式排版输出。"
+                },
+                "stopIfFail": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {
+                "isSuccess": null,
+                "output": "截图提示词",
+                "errMessage": null
+              },
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            }
+          ],
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": true,
+          "DelayMs": 0
+        },
+        {
+          "StepRunnerKey": "sys:stop",
+          "InputParams": {
+            "method": {
+              "VarKey": null,
+              "Value": "default"
+            },
+            "isError": {
+              "VarKey": null,
+              "Value": "0"
+            },
+            "return": {
+              "VarKey": null,
+              "Value": ""
+            },
+            "showMessage": {
+              "VarKey": null,
+              "Value": ""
+            }
+          },
+          "OutputParams": {},
+          "IfSteps": null,
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": false,
+          "DelayMs": 0
+        }
+      ],
+      "ElseSteps": null,
+      "Note": "",
+      "Disabled": false,
+      "Collapsed": true,
+      "DelayMs": 0
+    },
+    {
+      "StepRunnerKey": "sys:subprogram",
+      "InputParams": {
+        "subProgram": {
+          "VarKey": null,
+          "Value": "赋值"
+        },
+        "var:模式": {
+          "VarKey": "模式",
+          "Value": null
+        },
+        "stopIfFail": {
+          "VarKey": null,
+          "Value": "0"
+        },
+        "skipDebugOutput": {
+          "VarKey": null,
+          "Value": "false"
+        },
+        "summary": {
+          "VarKey": null,
+          "Value": ""
+        }
+      },
+      "OutputParams": {
+        "isSuccess": null,
+        "var:url": "url",
+        "var:url_size": "url_size",
+        "errMessage": null
+      },
+      "IfSteps": null,
+      "ElseSteps": null,
+      "Note": "",
+      "Disabled": false,
+      "Collapsed": false,
+      "DelayMs": 0
+    },
+    {
+      "StepRunnerKey": "sys:subprogram",
+      "InputParams": {
+        "subProgram": {
+          "VarKey": null,
+          "Value": "控件名赋值"
+        },
+        "var:模式": {
+          "VarKey": "模式",
+          "Value": null
+        },
+        "stopIfFail": {
+          "VarKey": null,
+          "Value": "1"
+        },
+        "skipDebugOutput": {
+          "VarKey": null,
+          "Value": "false"
+        },
+        "summary": {
+          "VarKey": null,
+          "Value": ""
+        }
+      },
+      "OutputParams": {
+        "isSuccess": null,
+        "var:控件名": "控件名",
+        "errMessage": null
+      },
+      "IfSteps": null,
+      "ElseSteps": null,
+      "Note": "",
+      "Disabled": false,
+      "Collapsed": false,
+      "DelayMs": 0
+    },
+    {
+      "StepRunnerKey": "sys:simpleIf",
+      "InputParams": {
+        "condition": {
+          "VarKey": null,
+          "Value": "$= String.Equals({chat_mode}, \"文本\")"
+        }
+      },
+      "OutputParams": {},
+      "IfSteps": [
+        {
+          "StepRunnerKey": "sys:getSelectedText",
+          "InputParams": {
+            "format": {
+              "VarKey": null,
+              "Value": "UnicodeText"
+            },
+            "waitMs": {
+              "VarKey": null,
+              "Value": "250"
+            },
+            "repeat": {
+              "VarKey": null,
+              "Value": "0"
+            },
+            "trim": {
+              "VarKey": null,
+              "Value": "1"
+            },
+            "tryNoClipboard": {
+              "VarKey": null,
+              "Value": "0"
+            },
+            "useActionParam": {
+              "VarKey": null,
+              "Value": "0"
+            },
+            "stopIfFail": {
+              "VarKey": null,
+              "Value": "0"
+            }
+          },
+          "OutputParams": {
+            "isSuccess": "是否获取到文本",
+            "output": "获取的文本",
+            "outputEncoded": null,
+            "url": null,
+            "errMessage": null
+          },
+          "IfSteps": null,
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": false,
+          "DelayMs": 0
+        },
+        {
+          "StepRunnerKey": "sys:if",
+          "InputParams": {
+            "condition": {
+              "VarKey": "是否获取到文本",
+              "Value": null
+            }
+          },
+          "OutputParams": {},
+          "IfSteps": [
+            {
+              "StepRunnerKey": "sys:webview2",
+              "InputParams": {
+                "type": {
+                  "VarKey": null,
+                  "Value": "OpenAndWaitLoad"
+                },
+                "url": {
+                  "VarKey": "url",
+                  "Value": null
+                },
+                "additionalBrowserArguments": {
+                  "VarKey": null,
+                  "Value": ""
+                },
+                "virtualHostToFolder": {
+                  "VarKey": null,
+                  "Value": ""
+                },
+                "userAgent": {
+                  "VarKey": null,
+                  "Value": ""
+                },
+                "title": {
+                  "VarKey": "模式",
+                  "Value": null
+                },
+                "icon": {
+                  "VarKey": null,
+                  "Value": ""
+                },
+                "defaultBgColor": {
+                  "VarKey": null,
+                  "Value": ""
+                },
+                "autoCloseKey": {
+                  "VarKey": null,
+                  "Value": "="
+                },
+                "modeForExists": {
+                  "VarKey": null,
+                  "Value": "BringToFront"
+                },
+                "script": {
+                  "VarKey": null,
+                  "Value": ""
+                },
+                "winLocation": {
+                  "VarKey": null,
+                  "Value": "CenterScreen"
+                },
+                "winSize": {
+                  "VarKey": "url_size",
+                  "Value": null
+                },
+                "stopIfFail": {
+                  "VarKey": null,
+                  "Value": "0"
+                },
+                "defaultDownloadFolderPath": {
+                  "VarKey": null,
+                  "Value": ""
+                },
+                "profileName": {
+                  "VarKey": null,
+                  "Value": ""
+                },
+                "topMost": {
+                  "VarKey": null,
+                  "Value": "false"
+                },
+                "showInTaskbar": {
+                  "VarKey": null,
+                  "Value": "true"
+                },
+                "noActivate": {
+                  "VarKey": null,
+                  "Value": "false"
+                },
+                "closeWhenLostFocus": {
+                  "VarKey": null,
+                  "Value": "false"
+                },
+                "escCloseWindow": {
+                  "VarKey": null,
+                  "Value": "false"
+                },
+                "showToolbar": {
+                  "VarKey": null,
+                  "Value": "false"
+                },
+                "windowStyle": {
+                  "VarKey": null,
+                  "Value": "normal"
+                },
+                "clearCookies": {
+                  "VarKey": null,
+                  "Value": "0"
+                },
+                "addDevTool": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {
+                "isSuccess": "是否加载完成",
+                "hWnd": null,
+                "webView": null,
+                "lastLocation": null,
+                "currUri": null,
+                "docTitle": null,
+                "sourceCode": null,
+                "cookies": null,
+                "errMessage": null
+              },
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            },
+            {
+              "StepRunnerKey": "sys:simpleIf",
+              "InputParams": {
+                "condition": {
+                  "VarKey": "是否加载完成",
+                  "Value": null
+                }
+              },
+              "OutputParams": {},
+              "IfSteps": [
+                {
+                  "StepRunnerKey": "sys:repeat",
+                  "InputParams": {
+                    "count": {
+                      "VarKey": null,
+                      "Value": "-1"
+                    },
+                    "stopCondition": {
+                      "VarKey": "是否成功",
+                      "Value": null
+                    },
+                    "startIndex": {
+                      "VarKey": null,
+                      "Value": "0"
+                    },
+                    "repeatDelayMs": {
+                      "VarKey": null,
+                      "Value": "200"
+                    },
+                    "progressBarTitle": {
+                      "VarKey": null,
+                      "Value": ""
+                    }
+                  },
+                  "OutputParams": {
+                    "count": null
+                  },
+                  "IfSteps": [
+                    {
+                      "StepRunnerKey": "sys:uiautomation",
+                      "InputParams": {
+                        "type": {
+                          "VarKey": null,
+                          "Value": "TriggerControl"
+                        },
+                        "window": {
+                          "VarKey": null,
+                          "Value": ""
+                        },
+                        "control": {
+                          "VarKey": "控件名",
+                          "Value": null
+                        },
+                        "controlType": {
+                          "VarKey": null,
+                          "Value": "0"
+                        },
+                        "controlOperation": {
+                          "VarKey": null,
+                          "Value": "LeftClick"
+                        },
+                        "value": {
+                          "VarKey": null,
+                          "Value": ""
+                        },
+                        "stopIfFail": {
+                          "VarKey": null,
+                          "Value": "0"
+                        }
+                      },
+                      "OutputParams": {
+                        "isSuccess": "是否成功",
+                        "errMessage": null
+                      },
+                      "IfSteps": null,
+                      "ElseSteps": null,
+                      "Note": "",
+                      "Disabled": false,
+                      "Collapsed": false,
+                      "DelayMs": 0
+                    }
+                  ],
+                  "ElseSteps": null,
+                  "Note": "",
+                  "Disabled": false,
+                  "Collapsed": false,
+                  "DelayMs": 0
+                }
+              ],
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": true,
+              "DelayMs": 0
+            },
+            {
+              "StepRunnerKey": "sys:simpleIf",
+              "InputParams": {
+                "condition": {
+                  "VarKey": "是否成功",
+                  "Value": null
+                }
+              },
+              "OutputParams": {},
+              "IfSteps": [
+                {
+                  "StepRunnerKey": "sys:delay",
+                  "InputParams": {
+                    "delayMs": {
+                      "VarKey": null,
+                      "Value": "250"
+                    },
+                    "monitorWaitWin": {
+                      "VarKey": null,
+                      "Value": "0"
+                    }
+                  },
+                  "OutputParams": {},
+                  "IfSteps": null,
+                  "ElseSteps": null,
+                  "Note": "",
+                  "Disabled": false,
+                  "Collapsed": false,
+                  "DelayMs": 0
+                },
+                {
+                  "StepRunnerKey": "sys:outputText",
+                  "InputParams": {
+                    "content": {
+                      "VarKey": null,
+                      "Value": "$$----\r\n{文本提示词}\r\n----\r\n以下是输入内容：\r\n{获取的文本}"
+                    },
+                    "method": {
+                      "VarKey": null,
+                      "Value": "paste"
+                    },
+                    "delayBeforePaste": {
+                      "VarKey": null,
+                      "Value": "50"
+                    },
+                    "delayAfterPaste": {
+                      "VarKey": null,
+                      "Value": "10"
+                    },
+                    "appendReturn": {
+                      "VarKey": null,
+                      "Value": "1"
+                    },
+                    "stopIfFail": {
+                      "VarKey": null,
+                      "Value": "0"
+                    }
+                  },
+                  "OutputParams": {
+                    "isSuccess": "是否成功",
+                    "errMessage": null
+                  },
+                  "IfSteps": null,
+                  "ElseSteps": null,
+                  "Note": "",
+                  "Disabled": false,
+                  "Collapsed": false,
+                  "DelayMs": 0
+                }
+              ],
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": true,
+              "DelayMs": 0
+            },
+            {
+              "StepRunnerKey": "sys:simpleIf",
+              "InputParams": {
+                "condition": {
+                  "VarKey": null,
+                  "Value": "$={是否成功} = false"
+                }
+              },
+              "OutputParams": {},
+              "IfSteps": [
+                {
+                  "StepRunnerKey": "sys:stop",
+                  "InputParams": {
+                    "method": {
+                      "VarKey": null,
+                      "Value": "default"
+                    },
+                    "isError": {
+                      "VarKey": null,
+                      "Value": "0"
+                    },
+                    "return": {
+                      "VarKey": null,
+                      "Value": ""
+                    },
+                    "showMessage": {
+                      "VarKey": null,
+                      "Value": ""
+                    }
+                  },
+                  "OutputParams": {},
+                  "IfSteps": null,
+                  "ElseSteps": null,
+                  "Note": "",
+                  "Disabled": false,
+                  "Collapsed": false,
+                  "DelayMs": 0
+                }
+              ],
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": true,
+              "DelayMs": 0
+            }
+          ],
+          "ElseSteps": [
+            {
+              "StepRunnerKey": "sys:webview2",
+              "InputParams": {
+                "type": {
+                  "VarKey": null,
+                  "Value": "OpenUrl"
+                },
+                "url": {
+                  "VarKey": "url",
+                  "Value": null
+                },
+                "additionalBrowserArguments": {
+                  "VarKey": null,
+                  "Value": ""
+                },
+                "virtualHostToFolder": {
+                  "VarKey": null,
+                  "Value": ""
+                },
+                "userAgent": {
+                  "VarKey": null,
+                  "Value": ""
+                },
+                "title": {
+                  "VarKey": "模式",
+                  "Value": null
+                },
+                "icon": {
+                  "VarKey": null,
+                  "Value": ""
+                },
+                "defaultBgColor": {
+                  "VarKey": null,
+                  "Value": ""
+                },
+                "autoCloseKey": {
+                  "VarKey": null,
+                  "Value": "="
+                },
+                "modeForExists": {
+                  "VarKey": null,
+                  "Value": "BringToFront"
+                },
+                "script": {
+                  "VarKey": null,
+                  "Value": ""
+                },
+                "winLocation": {
+                  "VarKey": null,
+                  "Value": "CenterScreen"
+                },
+                "winSize": {
+                  "VarKey": "url_size",
+                  "Value": null
+                },
+                "stopIfFail": {
+                  "VarKey": null,
+                  "Value": "0"
+                },
+                "defaultDownloadFolderPath": {
+                  "VarKey": null,
+                  "Value": ""
+                },
+                "profileName": {
+                  "VarKey": null,
+                  "Value": ""
+                },
+                "topMost": {
+                  "VarKey": null,
+                  "Value": "false"
+                },
+                "showInTaskbar": {
+                  "VarKey": null,
+                  "Value": "true"
+                },
+                "noActivate": {
+                  "VarKey": null,
+                  "Value": "false"
+                },
+                "closeWhenLostFocus": {
+                  "VarKey": null,
+                  "Value": "false"
+                },
+                "escCloseWindow": {
+                  "VarKey": null,
+                  "Value": "false"
+                },
+                "showToolbar": {
+                  "VarKey": null,
+                  "Value": "false"
+                },
+                "windowStyle": {
+                  "VarKey": null,
+                  "Value": "normal"
+                },
+                "clearCookies": {
+                  "VarKey": null,
+                  "Value": "0"
+                },
+                "addDevTool": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {
+                "isSuccess": "是否加载完成",
+                "hWnd": null,
+                "webView": null,
+                "errMessage": null
+              },
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 1000
+            },
+            {
+              "StepRunnerKey": "sys:stop",
+              "InputParams": {
+                "method": {
+                  "VarKey": null,
+                  "Value": "forcestop"
+                },
+                "isError": {
+                  "VarKey": null,
+                  "Value": "0"
+                },
+                "return": {
+                  "VarKey": null,
+                  "Value": ""
+                },
+                "showMessage": {
+                  "VarKey": null,
+                  "Value": ""
+                }
+              },
+              "OutputParams": {},
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            }
+          ],
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": true,
+          "DelayMs": 0
+        }
+      ],
+      "ElseSteps": null,
+      "Note": "",
+      "Disabled": false,
+      "Collapsed": true,
+      "DelayMs": 0
+    },
+    {
+      "StepRunnerKey": "sys:simpleIf",
+      "InputParams": {
+        "condition": {
+          "VarKey": null,
+          "Value": "$= String.Equals({chat_mode}, \"截图\")"
+        }
+      },
+      "OutputParams": {},
+      "IfSteps": [
+        {
+          "StepRunnerKey": "sys:screenCapture",
+          "InputParams": {
+            "type": {
+              "VarKey": null,
+              "Value": "select"
+            },
+            "delay": {
+              "VarKey": null,
+              "Value": "0"
+            },
+            "toClip": {
+              "VarKey": null,
+              "Value": "1"
+            },
+            "stopIfFail": {
+              "VarKey": null,
+              "Value": "1"
+            },
+            "preSelectArea": {
+              "VarKey": null,
+              "Value": ""
+            },
+            "includeRightBottomBorder": {
+              "VarKey": null,
+              "Value": "1"
+            }
+          },
+          "OutputParams": {
+            "img": "image",
+            "rect": null,
+            "isSuccess": null,
+            "errMessage": null
+          },
+          "IfSteps": null,
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": false,
+          "DelayMs": 0
+        },
+        {
+          "StepRunnerKey": "sys:getClipboardImage",
+          "InputParams": {
+            "stopIfFail": {
+              "VarKey": null,
+              "Value": "1"
+            }
+          },
+          "OutputParams": {
+            "isSuccess": "是否成功",
+            "output": "image",
+            "elapsedMs": null,
+            "errMessage": null
+          },
+          "IfSteps": null,
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": false,
+          "DelayMs": 0
+        },
+        {
+          "StepRunnerKey": "sys:writeClipboard",
+          "InputParams": {
+            "type": {
+              "VarKey": null,
+              "Value": "auto"
+            },
+            "input": {
+              "VarKey": "image",
+              "Value": null
+            },
+            "successMsg": {
+              "VarKey": null,
+              "Value": ""
+            },
+            "stopIfFail": {
+              "VarKey": null,
+              "Value": "1"
+            }
+          },
+          "OutputParams": {
+            "isSuccess": "是否成功",
+            "errMessage": null
+          },
+          "IfSteps": null,
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": false,
+          "DelayMs": 0
+        },
+        {
+          "StepRunnerKey": "sys:webview2",
+          "InputParams": {
+            "type": {
+              "VarKey": null,
+              "Value": "OpenUrl"
+            },
+            "url": {
+              "VarKey": "url",
+              "Value": null
+            },
+            "additionalBrowserArguments": {
+              "VarKey": null,
+              "Value": ""
+            },
+            "virtualHostToFolder": {
+              "VarKey": null,
+              "Value": ""
+            },
+            "userAgent": {
+              "VarKey": null,
+              "Value": ""
+            },
+            "title": {
+              "VarKey": "模式",
+              "Value": null
+            },
+            "icon": {
+              "VarKey": null,
+              "Value": ""
+            },
+            "defaultBgColor": {
+              "VarKey": null,
+              "Value": ""
+            },
+            "autoCloseKey": {
+              "VarKey": null,
+              "Value": "="
+            },
+            "modeForExists": {
+              "VarKey": null,
+              "Value": "BringToFront"
+            },
+            "script": {
+              "VarKey": null,
+              "Value": ""
+            },
+            "winLocation": {
+              "VarKey": null,
+              "Value": "CenterScreen"
+            },
+            "winSize": {
+              "VarKey": "url_size",
+              "Value": null
+            },
+            "stopIfFail": {
+              "VarKey": null,
+              "Value": "0"
+            },
+            "defaultDownloadFolderPath": {
+              "VarKey": null,
+              "Value": ""
+            },
+            "profileName": {
+              "VarKey": null,
+              "Value": ""
+            },
+            "topMost": {
+              "VarKey": null,
+              "Value": "false"
+            },
+            "showInTaskbar": {
+              "VarKey": null,
+              "Value": "true"
+            },
+            "noActivate": {
+              "VarKey": null,
+              "Value": "false"
+            },
+            "closeWhenLostFocus": {
+              "VarKey": null,
+              "Value": "false"
+            },
+            "escCloseWindow": {
+              "VarKey": null,
+              "Value": "false"
+            },
+            "showToolbar": {
+              "VarKey": null,
+              "Value": "false"
+            },
+            "windowStyle": {
+              "VarKey": null,
+              "Value": "normal"
+            },
+            "clearCookies": {
+              "VarKey": null,
+              "Value": "0"
+            },
+            "addDevTool": {
+              "VarKey": null,
+              "Value": "0"
+            }
+          },
+          "OutputParams": {
+            "isSuccess": null,
+            "hWnd": null,
+            "webView": null,
+            "errMessage": null
+          },
+          "IfSteps": null,
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": false,
+          "DelayMs": 0
+        },
+        {
+          "StepRunnerKey": "sys:repeat",
+          "InputParams": {
+            "count": {
+              "VarKey": null,
+              "Value": "-1"
+            },
+            "stopCondition": {
+              "VarKey": "是否存在",
+              "Value": null
+            },
+            "startIndex": {
+              "VarKey": null,
+              "Value": "0"
+            },
+            "repeatDelayMs": {
+              "VarKey": null,
+              "Value": "200"
+            },
+            "progressBarTitle": {
+              "VarKey": null,
+              "Value": ""
+            }
+          },
+          "OutputParams": {
+            "count": null
+          },
+          "IfSteps": [
+            {
+              "StepRunnerKey": "sys:uiautomation",
+              "InputParams": {
+                "type": {
+                  "VarKey": null,
+                  "Value": "GetControlInfo"
+                },
+                "window": {
+                  "VarKey": null,
+                  "Value": ""
+                },
+                "control": {
+                  "VarKey": "控件名",
+                  "Value": null
+                },
+                "controlType": {
+                  "VarKey": null,
+                  "Value": "50004"
+                },
+                "stopIfFail": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {
+                "isSuccess": null,
+                "value": null,
+                "controlText": null,
+                "rect": null,
+                "controlName": null,
+                "controlType": null,
+                "controlIsEnabled": null,
+                "controlIsVisible": "是否存在",
+                "controlNativeWindowHandle": null,
+                "controlTypeId": null,
+                "errMessage": null
+              },
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "控件窗口是否存在",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            }
+          ],
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": true,
+          "DelayMs": 0
+        },
+        {
+          "StepRunnerKey": "sys:simpleIf",
+          "InputParams": {
+            "condition": {
+              "VarKey": "是否存在",
+              "Value": null
+            }
+          },
+          "OutputParams": {},
+          "IfSteps": [
+            {
+              "StepRunnerKey": "sys:delay",
+              "InputParams": {
+                "delayMs": {
+                  "VarKey": null,
+                  "Value": "250"
+                },
+                "monitorWaitWin": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {},
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            },
+            {
+              "StepRunnerKey": "sys:uiautomation",
+              "InputParams": {
+                "type": {
+                  "VarKey": null,
+                  "Value": "TriggerControl"
+                },
+                "window": {
+                  "VarKey": null,
+                  "Value": ""
+                },
+                "control": {
+                  "VarKey": "控件名",
+                  "Value": null
+                },
+                "controlType": {
+                  "VarKey": null,
+                  "Value": "50004"
+                },
+                "controlOperation": {
+                  "VarKey": null,
+                  "Value": "LeftClick"
+                },
+                "value": {
+                  "VarKey": null,
+                  "Value": ""
+                },
+                "stopIfFail": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {
+                "isSuccess": "是否成功",
+                "errMessage": null
+              },
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            }
+          ],
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": true,
+          "DelayMs": 0
+        },
+        {
+          "StepRunnerKey": "sys:simpleIf",
+          "InputParams": {
+            "condition": {
+              "VarKey": "是否成功",
+              "Value": null
+            }
+          },
+          "OutputParams": {},
+          "IfSteps": [
+            {
+              "StepRunnerKey": "sys:delay",
+              "InputParams": {
+                "delayMs": {
+                  "VarKey": null,
+                  "Value": "250"
+                },
+                "monitorWaitWin": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {},
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            },
+            {
+              "StepRunnerKey": "sys:keyInput",
+              "InputParams": {
+                "keys": {
+                  "VarKey": null,
+                  "Value": "{\"CtrlKeys\":[162],\"Keys\":[86]}"
+                },
+                "repeat": {
+                  "VarKey": null,
+                  "Value": "1"
+                },
+                "interval": {
+                  "VarKey": null,
+                  "Value": "1"
+                },
+                "holdMs": {
+                  "VarKey": null,
+                  "Value": "-1"
+                }
+              },
+              "OutputParams": {},
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            },
+            {
+              "StepRunnerKey": "sys:delay",
+              "InputParams": {
+                "delayMs": {
+                  "VarKey": null,
+                  "Value": "250"
+                },
+                "monitorWaitWin": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {},
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            },
+            {
+              "StepRunnerKey": "sys:outputText",
+              "InputParams": {
+                "content": {
+                  "VarKey": "截图提示词",
+                  "Value": null
+                },
+                "method": {
+                  "VarKey": null,
+                  "Value": "paste"
+                },
+                "delayBeforePaste": {
+                  "VarKey": null,
+                  "Value": "50"
+                },
+                "delayAfterPaste": {
+                  "VarKey": null,
+                  "Value": "10"
+                },
+                "appendReturn": {
+                  "VarKey": null,
+                  "Value": "1"
+                },
+                "stopIfFail": {
+                  "VarKey": null,
+                  "Value": "0"
+                }
+              },
+              "OutputParams": {
+                "isSuccess": "是否成功",
+                "errMessage": null
+              },
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 5000
+            },
+            {
+              "StepRunnerKey": "sys:repeat",
+              "InputParams": {
+                "count": {
+                  "VarKey": null,
+                  "Value": "2"
+                },
+                "stopCondition": {
+                  "VarKey": null,
+                  "Value": ""
+                },
+                "startIndex": {
+                  "VarKey": null,
+                  "Value": "0"
+                },
+                "repeatDelayMs": {
+                  "VarKey": null,
+                  "Value": "500"
+                },
+                "progressBarTitle": {
+                  "VarKey": null,
+                  "Value": ""
+                }
+              },
+              "OutputParams": {
+                "count": null
+              },
+              "IfSteps": [
+                {
+                  "StepRunnerKey": "sys:keyInput",
+                  "InputParams": {
+                    "keys": {
+                      "VarKey": null,
+                      "Value": "{\"CtrlKeys\":[],\"Keys\":[13]}"
+                    },
+                    "repeat": {
+                      "VarKey": null,
+                      "Value": "1"
+                    },
+                    "interval": {
+                      "VarKey": null,
+                      "Value": "1"
+                    },
+                    "holdMs": {
+                      "VarKey": null,
+                      "Value": "-1"
+                    }
+                  },
+                  "OutputParams": {},
+                  "IfSteps": null,
+                  "ElseSteps": null,
+                  "Note": "",
+                  "Disabled": false,
+                  "Collapsed": false,
+                  "DelayMs": 0
+                }
+              ],
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": true,
+              "DelayMs": 0
+            },
+            {
+              "StepRunnerKey": "sys:stop",
+              "InputParams": {
+                "method": {
+                  "VarKey": null,
+                  "Value": "default"
+                },
+                "isError": {
+                  "VarKey": null,
+                  "Value": "0"
+                },
+                "return": {
+                  "VarKey": null,
+                  "Value": ""
+                },
+                "showMessage": {
+                  "VarKey": null,
+                  "Value": ""
+                }
+              },
+              "OutputParams": {},
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            }
+          ],
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": true,
+          "DelayMs": 0
+        }
+      ],
+      "ElseSteps": null,
+      "Note": "",
+      "Disabled": false,
+      "Collapsed": true,
+      "DelayMs": 0
+    },
+    {
+      "StepRunnerKey": "sys:repeat",
+      "InputParams": {
+        "count": {
+          "VarKey": null,
+          "Value": "-1"
+        },
+        "stopCondition": {
+          "VarKey": null,
+          "Value": ""
+        },
+        "startIndex": {
+          "VarKey": null,
+          "Value": "0"
+        },
+        "repeatDelayMs": {
+          "VarKey": null,
+          "Value": "100"
+        },
+        "progressBarTitle": {
+          "VarKey": null,
+          "Value": ""
+        }
+      },
+      "OutputParams": {
+        "count": null
+      },
+      "IfSteps": [
+        {
+          "StepRunnerKey": "sys:webview2",
+          "InputParams": {
+            "type": {
+              "VarKey": null,
+              "Value": "CheckWindowState"
+            },
+            "autoCloseKey": {
+              "VarKey": null,
+              "Value": "="
+            },
+            "stopIfFail": {
+              "VarKey": null,
+              "Value": "0"
+            }
+          },
+          "OutputParams": {
+            "isSuccess": "web窗口是否存在",
+            "hWnd": null,
+            "webView": null,
+            "lastLocation": null,
+            "currUri": null,
+            "docTitle": null,
+            "sourceCode": null,
+            "cookies": null,
+            "previewImage": null,
+            "isNavCompleted": null,
+            "errMessage": null
+          },
+          "IfSteps": null,
+          "ElseSteps": null,
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": false,
+          "DelayMs": 0
+        },
+        {
+          "StepRunnerKey": "sys:if",
+          "InputParams": {
+            "condition": {
+              "VarKey": "web窗口是否存在",
+              "Value": null
+            }
+          },
+          "OutputParams": {},
+          "IfSteps": [],
+          "ElseSteps": [
+            {
+              "StepRunnerKey": "sys:stop",
+              "InputParams": {
+                "method": {
+                  "VarKey": null,
+                  "Value": "forcestop"
+                },
+                "isError": {
+                  "VarKey": null,
+                  "Value": "0"
+                },
+                "return": {
+                  "VarKey": null,
+                  "Value": ""
+                },
+                "showMessage": {
+                  "VarKey": null,
+                  "Value": ""
+                }
+              },
+              "OutputParams": {},
+              "IfSteps": null,
+              "ElseSteps": null,
+              "Note": "",
+              "Disabled": false,
+              "Collapsed": false,
+              "DelayMs": 0
+            }
+          ],
+          "Note": "",
+          "Disabled": false,
+          "Collapsed": true,
+          "DelayMs": 0
+        }
+      ],
+      "ElseSteps": null,
+      "Note": "",
+      "Disabled": false,
+      "Collapsed": true,
+      "DelayMs": 0
+    }
+  ]
+}
