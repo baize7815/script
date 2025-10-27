@@ -2,7 +2,8 @@
 // @name        百度网盘Svip会员破解青春版
 // @namespace   http://tampermonkey.net/
 // @match       https://pan.baidu.com/
-// @match       https://pan.baidu.com/*
+// @match       https://pan.baidu.com/disk/*
+// @match       https://pan.baidu.com/s/*
 // @grant       unsafeWindow
 // @grant       GM_setValue
 // @grant       GM_getValue
@@ -116,9 +117,9 @@
               "v10_id": "666666",
               "last_manual_collection_time": 0
             }
-            res.product_infos = [{
+            res。product_infos = [{
               "product_id": "",
-              "start_time": 1685635199,
+              "start_time": 1685635199，
               "end_time": 1888227199,
               "buy_time": 0,
               "cluster": "vip",
@@ -127,65 +128,65 @@
               "product_name": "svip2_nd",
               "status": 0,
               "function_num": 0,
-              "buy_description": "",
-              "product_description": "",
+              "buy_description": ""，
+              "product_description": ""，
               "cur_svip_type": "month"
             }]
             res.current_product = {
               "cluster": "vip",
-              "detail_cluster": "svip",
+              "detail_cluster": "svip"，
               "product_type": "vip2_1m_auto",
               "product_id": "12187135090581539740"
             }
             res.current_product_v2 = {
               "cluster": "vip",
-              "detail_cluster": "svip",
-              "product_type": "vip2_1m_auto",
+              "detail_cluster": "svip"，
+              "product_type": "vip2_1m_auto"，
               "product_id": "12187135090581539740"
             }
-            Object.defineProperty(this, "responseText", {
-                writable: true,
+            Object。defineProperty(this， "responseText"， {
+                writable: true，
             });
-            this.responseText = JSON.stringify(res)
+            this。responseText = JSON.stringify(res)
           }
         })
-        originalOpen.apply(this, arguments);
-      } else if (url.indexOf('/api/streaming') != -1 && url.indexOf('M3U8_SUBTITLE_SRT') == -1) { //获取视频m3u8接口
+        originalOpen。apply(this, arguments);
+      } else if (url。indexOf('/api/streaming') != -1 && url.indexOf('M3U8_SUBTITLE_SRT') == -1) { //获取视频m3u8接口
         let modifiedUrl = url.replace(/vip=2/, 'vip=0')
-                .replace(/_1080&/, '_720&')
+                。替换(/_1080&/， '_720&')
         if (store.adToken) {
           modifiedUrl += ('&adToken=' + encodeURIComponent(store.adToken))
           this.adToken = store.adToken
           store.adToken = null
           store.m3u8url = modifiedUrl;
-          originalOpen.call(this, method, modifiedUrl, false);
+          originalOpen。call(this， method， modifiedUrl, false);
           return
         }
-        originalOpen.call(this, method, modifiedUrl);
-        this.addEventListener('readystatechange', function() {
-          if (this.readyState == 4) {
+        originalOpen.call(this， method， modifiedUrl);
+        this.addEventListener('readystatechange'， function() {
+          if (this。readyState == 4) {
             if (this.responseText[0] == '{') {
               let res = JSON.parse(this.responseText)
-              store.adToken = res.adToken
+              store。adToken = res.adToken
               let manualRequest = new XMLHttpRequest();
               // let manualUrl = `https://pan.baidu.com/api/streaming?app_id=250528&clienttype=0&channel=chunlei&web=1&isplayer=1&check_blue=1&type=M3U8_AUTO_${store.resolutionPattern.exec(url)[1]}&trans=&vip=0` +
               //           `&bdstoken=${store.bdstoken||unsafeWindow.locals.bdstoken}&path=${store.path}&jsToken=${unsafeWindow.jsToken}`
               let manualUrl = modifiedUrl
-              console.log(manualUrl)
-              manualRequest.open(method, manualUrl, false);
+              console。log(manualUrl)
+              manualRequest.open(method， manualUrl， false);
               manualRequest.send();
-              Object.defineProperty(this, "status", {
-                writable: true,
+              Object.defineProperty(this， "status"， {
+                writable: true，
               });
-              this.status = manualRequest.status;
-              Object.defineProperty(this, "responseText", {
+              this.status = manualRequest。status;
+              Object.defineProperty(this， "responseText", {
                 writable: true,
               });
               this.responseText = manualRequest.responseText;
             }
           }
         })
-      } else if (url.indexOf('/api/streaming') != -1 && url.indexOf('SUBTITLE_SRT') != -1 && false) {
+      } else if (url。indexOf('/api/streaming') != -1 && url.indexOf('SUBTITLE_SRT') != -1 && false) {
         // this.addEventListener('readystatechange', function() {
         //   if (this.readyState == 4) {
         //     let res = this.responseText
@@ -195,9 +196,9 @@
         //     this.responseText = res.replace(/https:\/\/.*?\//, 'https://nv0.baidupcs.com/')
         //   }
         // })
-        originalOpen.apply(this, arguments);
-      } else if (url.indexOf('/msg/streaming') != -1 || url.indexOf('/share/streaming') != -1) {
-        this.addEventListener('readystatechange', function() {
+        originalOpen。apply(this， arguments);
+      } else if (url。indexOf('/msg/streaming') != -1 || url.indexOf('/share/streaming') != -1) {
+        this.addEventListener('readystatechange'， function() {
           if (this.readyState == 4) {
             if (this.responseText[0] != '{')
               return
@@ -264,52 +265,52 @@
         let imageContainer = document.getElementById("export-image-container")
         // if (aiCourse && !aiCourse.querySelector('.vp-ai-course-tools')) {
         if (aiCourse) {
-          aiCourse.innerHTML = ''
+          aiCourse。innerHTML = ''
           aiCourseTools = createElement('div', 'vp-ai-course-tools', {style:'margin-bottom:5px;'})
           logText = createElement('span', '', {style:'margin-right:10px;font-size:16px;'})
           reloadBtn = createElement('button', '', {innerText: '重新加载', disabled: true, style: 'margin-right:10px;padding: 3px 10px;font-size: 14px;background:#fff;border:1px solid #ccc;cursor:pointer;'});
-          exportBtn = createElement('button', '', {innerText: '导出', disabled: true, style: 'padding: 3px 10px;font-size: 14px;background:#fff;border:1px solid #ccc;cursor:pointer;'});
+          exportBtn = createElement('button'， '', {innerText: '导出', disabled: true, style: 'padding: 3px 10px;font-size: 14px;background:#fff;border:1px solid #ccc;cursor:pointer;'});
           reloadBtn.onclick = () => {
             if (!reloadBtn.disabled) {
               showPdf();
             }
           }
           let exportLock = false;
-          exportBtn.onclick = () => {
+          exportBtn。onclick = () => {
             if (!exportBtn.disabled && !exportLock) {
               exportLock = true;
-              logText.innerText = "正在写入pdf"
-              if (store.captureHls)
-                store.captureHls.destroy();
-              store.captureHls = null;
+              logText。innerText = "正在写入pdf"
+              if (store。captureHls)
+                store。captureHls.destroy();
+              store。captureHls = null;
               // 导出pdf
               const imgs = imageContainer.querySelectorAll('img')
               let w = imgs[0].naturalWidth, h = imgs[0].naturalHeight
               let pdf = new jspdf.jsPDF('l', 'px', [w, h]);
               for (let i = 0; i < imgs.length; i++) {
                   let img = imgs[i]
-                  pdf.addImage(img.src, 'JPEG', 0, 0, w, h)
-                  pdf.addPage([img.naturalWidth, img.naturalHeight], 'l')
+                  pdf.addImage(img。src, 'JPEG', 0, 0, w, h)
+                  pdf。addPage([img.naturalWidth, img.naturalHeight], 'l')
               }
               const targetPage = pdf.internal.getNumberOfPages()
-              pdf.deletePage(targetPage)
+              pdf。deletePage(targetPage)
               pdf.save(document.querySelector('.vp-personal-home-layout__video > .vp-toolsbar > .vp-toolsbar__title').title + '.pdf')
-              logText.innerHTML = '<span style="color:green">导出成功</span>'
+              logText。innerHTML = '<span style="color:green">导出成功</span>'
               // store.timePoints = []
               exportLock = false;
             }
           }
-          aiCourseTools.appendChild(logText)
-          aiCourseTools.appendChild(reloadBtn)
+          aiCourseTools。appendChild(logText)
+          aiCourseTools。appendChild(reloadBtn)
           aiCourseTools.appendChild(exportBtn)
-          aiCourse.append(aiCourseTools);
+          aiCourse。append(aiCourseTools);
         }
         if (!imageContainer) {
           imageContainer = document.createElement('div')
           imageContainer.id = "export-image-container"
-          imageContainer.style.overflowY = 'auto'
+          imageContainer。style.overflowY = 'auto'
         } else {
-          imageContainer.innerHTML = ''
+          imageContainer。innerHTML = ''
         }
         aiCourse.appendChild(imageContainer)
 
@@ -412,52 +413,52 @@
       } else if (n == 'self' && store.shareFilePage) {
         t = 1
       }
-      console.log(arguments)
-      originalSet.apply(this, [n, t])
+      console。log(arguments)
+      originalSet。apply(this， [n, t])
     }
-    if (unsafeWindow.locals.userInfo) {
-      unsafeWindow.locals.userInfo.vip_level = 10
-      unsafeWindow.locals.userInfo.vip_identity = 21
+    if (unsafeWindow。locals。userInfo) {
+      unsafeWindow。locals。userInfo。vip_level = 10
+      unsafeWindow。locals。userInfo。vip_identity = 21
       unsafeWindow.locals.userInfo.svip10_id = '请低调使用，安装后24小时内自行删除'
       store.shareFilePage && (unsafeWindow.locals.self = 1)
-    } else if(unsafeWindow.locals.mset) {
-      unsafeWindow.locals.mset({
-        'is_vip': 1,
-        'is_svip': 1,
-        'vip_level': 10,
-        'svip10_id': '请低调使用，安装后24小时内自行删除',
-        'show_vip_ad': 0,
+    } else if(unsafeWindow。locals。mset) {
+      unsafeWindow。locals。mset({
+        'is_vip': 1，
+        'is_svip': 1，
+        'vip_level': 10，
+        'svip10_id': '请低调使用，安装后24小时内自行删除'，
+        'show_vip_ad': 0，
       })
     } else {
-      unsafeWindow.locals.vip_level = 10
-      unsafeWindow.locals.svip10_id = '请低调使用，安装后24小时内自行删除'
-      unsafeWindow.locals.is_vip = 1
-      unsafeWindow.locals.is_svip = 1
-      unsafeWindow.locals.is_evip = 0
-      unsafeWindow.locals.show_vip_ad = 0
-      store.shareFilePage && (unsafeWindow.locals.self = 1)
+      unsafeWindow。locals。vip_level = 10
+      unsafeWindow。locals。svip10_id = '请低调使用，安装后24小时内自行删除'
+      unsafeWindow。locals。is_vip = 1
+      unsafeWindow。locals。is_svip = 1
+      unsafeWindow。locals。is_evip = 0
+      unsafeWindow。locals。show_vip_ad = 0
+      store。shareFilePage && (unsafeWindow。locals.self = 1)
     }
     try {
       initPanel()
     } catch(e) {}
-  }, 10)
+  }， 10)
 
   function fixRateChange() {
     const buttons = document.querySelectorAll('.vp-video__control-bar--playback-rates button');
     if (!buttons || buttons.length == 0) {
-      return setTimeout(fixRateChange, 300);
+      return setTimeout(fixRateChange， 300);
     }
     const read = GM_getValue('read_1.4.0', false);
     if (!read) {
       alert('脚本仅供交流学习使用，请在24小时内自觉删除此脚本，通过正规渠道购买会员。该版本解决倍速问题，后续脚本不再更新，感谢这一年大家的支持和建议❗')
-      GM_setValue('read_1.4.0', true);
+      GM_setValue('read_1.4.0'， true);
     }
-    for (const btn of buttons) {
-      btn.addEventListener('click', () => {
-        XMLHttpRequest.prototype.open = store.originalOpen;
+    for (const btn / buttons) {
+      btn。addEventListener('click'， () => {
+        XMLHttpRequest。prototype。open = store。originalOpen;
         setTimeout(() => {
           XMLHttpRequest.prototype.open = store.newOpen;
-        }, 100);
+        }， 100);
       })
     }
   }
