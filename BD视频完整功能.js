@@ -37,11 +37,11 @@
     const readyHls = () =>
       (window.Hls || unsafeWindow.Hls)
         ? Promise.resolve()
-        : loadJs('https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.4.14/hls.min.js');
+        : loadJs('https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.6.7/hls.min.js');
     const readyArtplayer = () =>
       (window.Artplayer || unsafeWindow.Artplayer)
         ? Promise.resolve()
-        : loadJs('https://cdnjs.cloudflare.com/ajax/libs/artplayer/5.2.2/artplayer.min.js');
+        : loadJs('https://cdnjs.cloudflare.com/ajax/libs/artplayer/5.2.3/artplayer.min.js');
     return {
       ready: () => Promise.all([readyHls(), readyArtplayer()]),
     };
